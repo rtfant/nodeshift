@@ -31,12 +31,12 @@ export default function InstallDialog({
   const [mirror, setMirror] = useState(defaultMirror);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-      <div className="w-[460px] rounded-2xl border border-border bg-card shadow-2xl shadow-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="w-[460px] rounded-2xl bg-white shadow-2xl card-shadow-lg">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <h2 className="text-base font-semibold">{t("install.title")}</h2>
+            <h2 className="text-base font-semibold text-foreground">{t("install.title")}</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
               {version.version}
               {version.lts ? ` (${version.lts} LTS)` : " (Current)"}
@@ -54,8 +54,8 @@ export default function InstallDialog({
         <div className="space-y-4 px-5 py-4">
           {/* Install Path */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold">
-              <FolderOpen size={13} className="text-muted-foreground" />
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+              <FolderOpen size={13} className="text-primary" />
               {t("install.installPath")}
             </label>
             <div className="flex gap-2">
@@ -63,14 +63,14 @@ export default function InstallDialog({
                 type="text"
                 value={installDir}
                 onChange={(e) => setInstallDir(e.target.value)}
-                className="flex-1 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+                className="flex-1 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
               />
               <button
                 onClick={async () => {
                   const folder = await pickFolder(installDir);
                   if (folder) setInstallDir(folder);
                 }}
-                className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-secondary/80"
+                className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-secondary"
               >
                 {t("install.browse")}
               </button>
@@ -82,14 +82,14 @@ export default function InstallDialog({
 
           {/* Mirror */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold">
-              <Globe size={13} className="text-muted-foreground" />
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-foreground">
+              <Globe size={13} className="text-primary" />
               {t("install.mirror")}
             </label>
             <select
               value={mirror}
               onChange={(e) => setMirror(e.target.value)}
-              className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+              className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
             >
               {MIRROR_KEYS.map((m) => (
                 <option key={m.url} value={m.url}>
@@ -100,26 +100,26 @@ export default function InstallDialog({
           </div>
 
           {/* Version Info */}
-          <div className="rounded-lg bg-muted/80 p-3">
+          <div className="rounded-lg bg-secondary/60 p-3">
             <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
               {t("install.versionDetails")}
             </h4>
             <div className="grid grid-cols-2 gap-1.5 text-[11px]">
               <div>
                 <span className="text-muted-foreground">npm: </span>
-                <span className="font-medium">{version.npm || "-"}</span>
+                <span className="font-medium text-foreground">{version.npm || "-"}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">V8: </span>
-                <span className="font-medium">{version.v8 || "-"}</span>
+                <span className="font-medium text-foreground">{version.v8 || "-"}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">{t("install.releaseDate")}: </span>
-                <span className="font-medium">{version.date}</span>
+                <span className="font-medium text-foreground">{version.date}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">OpenSSL: </span>
-                <span className="font-medium">{version.openssl || "-"}</span>
+                <span className="font-medium text-foreground">{version.openssl || "-"}</span>
               </div>
             </div>
           </div>
@@ -135,7 +135,7 @@ export default function InstallDialog({
           </button>
           <button
             onClick={() => onConfirm(installDir, mirror)}
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_12px_rgba(34,197,94,0.2)]"
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white transition-all hover:bg-primary/90 shadow-md btn-hover-lift"
           >
             <Download size={13} />
             {t("install.startInstall")}

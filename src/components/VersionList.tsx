@@ -56,11 +56,11 @@ export default function VersionList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">{t("versions.title")}</h1>
+        <h1 className="text-xl font-bold text-foreground">{t("versions.title")}</h1>
         <button
           onClick={reload}
           disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50 card-shadow"
         >
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
           {t("versions.refresh")}
@@ -74,15 +74,15 @@ export default function VersionList() {
 
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-0.5 rounded-lg bg-secondary/80 p-0.5">
+        <div className="flex gap-0.5 rounded-lg bg-white p-0.5 card-shadow">
           {(["lts", "current", "all"] as VersionFilter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
               className={`rounded-md px-3.5 py-1.5 text-xs font-medium transition-all duration-150 ${
                 filter === f
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
+                  ? "bg-primary text-white shadow-sm"
+                  : "text-muted-foreground hover:text-foreground hover:bg-secondary"
               }`}
             >
               {f === "lts" ? t("versions.lts") : f === "current" ? t("versions.current") : t("versions.all")}
@@ -100,14 +100,14 @@ export default function VersionList() {
             placeholder={t("versions.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-52 rounded-lg border border-border bg-card py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/50"
+            className="w-52 rounded-lg border border-border bg-white py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-2 focus:ring-primary/30 card-shadow"
           />
         </div>
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs text-destructive">
+        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-red-50 px-4 py-3 text-xs text-destructive">
           <AlertCircle size={14} />
           <span>{error}</span>
           <button onClick={reload} className="ml-auto font-medium underline">
@@ -126,9 +126,9 @@ export default function VersionList() {
 
       {/* Version Table */}
       {!loading && (
-        <div className="rounded-xl border border-border bg-card overflow-hidden">
+        <div className="rounded-xl bg-white overflow-hidden card-shadow">
           {/* Table Header */}
-          <div className="grid grid-cols-[1fr_110px_90px_90px_150px] gap-4 border-b border-border bg-secondary/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
+          <div className="grid grid-cols-[1fr_110px_90px_90px_150px] gap-4 border-b border-border bg-secondary/50 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             <span>{t("versions.version")}</span>
             <span>{t("versions.status")}</span>
             <span>{t("versions.ltsName")}</span>
@@ -149,14 +149,14 @@ export default function VersionList() {
                   className={`grid grid-cols-[1fr_110px_90px_90px_150px] items-center gap-4 border-b border-border/60 px-4 py-2.5 last:border-b-0 table-row-hover ${
                     active
                       ? "bg-primary/[0.04]"
-                      : "hover:bg-secondary/40"
+                      : "hover:bg-secondary/50"
                   }`}
                 >
                   {/* Version */}
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-[13px] font-semibold">{v.version}</span>
+                    <span className="font-mono text-[13px] font-semibold text-foreground">{v.version}</span>
                     {active && (
-                      <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
                         {t("versions.using")}
                       </span>
                     )}
@@ -190,7 +190,7 @@ export default function VersionList() {
                           installStatus.type !== "completed" &&
                           installStatus.type !== "error"
                         }
-                        className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_10px_rgba(34,197,94,0.2)] disabled:opacity-50"
+                        className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1 text-[11px] font-semibold text-white transition-all hover:bg-primary/90 hover:shadow-md disabled:opacity-50"
                       >
                         <Download size={12} />
                         {t("versions.install")}
@@ -210,7 +210,7 @@ export default function VersionList() {
                             await switchVersion(v.version);
                             await reloadConfig();
                           }}
-                          className="flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors hover:bg-secondary/80"
+                          className="flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors hover:bg-primary/10 hover:text-primary"
                         >
                           <ArrowUpDown size={11} />
                           {t("versions.use")}
@@ -222,7 +222,7 @@ export default function VersionList() {
                             await uninstallVersion(v.version);
                             await reloadConfig();
                           }}
-                          className="flex items-center gap-0.5 rounded-lg px-2 py-1 text-[11px] text-destructive/80 transition-colors hover:bg-destructive/10 hover:text-destructive"
+                          className="flex items-center gap-0.5 rounded-lg px-2 py-1 text-[11px] text-destructive/80 transition-colors hover:bg-red-50 hover:text-destructive"
                         >
                           <Trash2 size={11} />
                         </button>
@@ -258,10 +258,10 @@ export default function VersionList() {
 
 function StatusBadge({ status }: { status: string }) {
   const styles: Record<string, string> = {
-    "Active LTS": "bg-success/10 text-success border-success/20",
-    Maintenance: "bg-warning/10 text-warning border-warning/20",
-    Current: "bg-blue-500/10 text-blue-400 border-blue-500/20",
-    EOL: "bg-destructive/10 text-destructive border-destructive/20",
+    "Active LTS": "bg-green-50 text-green-700 border-green-200",
+    Maintenance: "bg-amber-50 text-amber-700 border-amber-200",
+    Current: "bg-blue-50 text-blue-600 border-blue-200",
+    EOL: "bg-red-50 text-red-600 border-red-200",
   };
   return (
     <span

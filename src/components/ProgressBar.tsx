@@ -13,12 +13,12 @@ export default function ProgressBar({ status, onDismiss }: ProgressBarProps) {
 
   return (
     <div
-      className={`rounded-xl border p-4 transition-theme ${
+      className={`rounded-xl p-4 transition-theme card-shadow ${
         status.type === "error"
-          ? "border-destructive/30 bg-destructive/5"
+          ? "bg-red-50 border border-red-200"
           : status.type === "completed"
-            ? "border-success/30 bg-success/5 glow-primary"
-            : "border-border bg-card"
+            ? "bg-green-50 border border-green-200 glow-success"
+            : "bg-white border border-border"
       }`}
     >
       <div className="mb-2 flex items-center justify-between">
@@ -34,7 +34,7 @@ export default function ProgressBar({ status, onDismiss }: ProgressBarProps) {
             status.type !== "idle" && (
               <Loader2 size={15} className="animate-spin text-primary" />
             )}
-          <span className="text-xs font-semibold">
+          <span className="text-xs font-semibold text-foreground">
             {status.type === "downloading" && t("install.downloading")}
             {status.type === "verifying" && t("install.verifying")}
             {status.type === "extracting" && t("install.extracting")}
@@ -55,7 +55,7 @@ export default function ProgressBar({ status, onDismiss }: ProgressBarProps) {
 
       {status.type === "downloading" && (
         <div className="space-y-1.5">
-          <div className="h-1.5 w-full overflow-hidden rounded-full bg-secondary">
+          <div className="h-2 w-full overflow-hidden rounded-full bg-secondary">
             <div
               className="h-full rounded-full bg-primary transition-all duration-300"
               style={{ width: `${status.progress.percentage}%` }}

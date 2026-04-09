@@ -128,12 +128,12 @@ export default function SettingsPanel() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">{t("settings.title")}</h1>
+        <h1 className="text-xl font-bold text-foreground">{t("settings.title")}</h1>
         <div className="flex gap-2">
           {dirty && (
             <button
               onClick={handleReset}
-              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground card-shadow"
             >
               <RotateCcw size={13} />
               {t("settings.reset")}
@@ -144,8 +144,8 @@ export default function SettingsPanel() {
             disabled={!dirty || saving}
             className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-semibold transition-all disabled:opacity-40 ${
               saved
-                ? "bg-success/10 text-success border border-success/20"
-                : "bg-primary text-primary-foreground hover:bg-primary/90"
+                ? "bg-green-50 text-success border border-green-200"
+                : "bg-primary text-white hover:bg-primary/90 shadow-md"
             }`}
           >
             <Save size={13} />
@@ -168,7 +168,7 @@ export default function SettingsPanel() {
               setInstallDir(e.target.value);
               markDirty();
             }}
-            className="flex-1 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary/50"
+            className="flex-1 rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs text-foreground font-mono focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
           <button
             onClick={async () => {
@@ -178,7 +178,7 @@ export default function SettingsPanel() {
                 markDirty();
               }
             }}
-            className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary/80"
+            className="rounded-lg border border-border bg-white px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
           >
             {t("settings.browse")}
           </button>
@@ -200,7 +200,7 @@ export default function SettingsPanel() {
             setMirror(e.target.value);
             markDirty();
           }}
-          className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+          className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
           {MIRROR_KEYS.map((m) => (
             <option key={m.url} value={m.url}>
@@ -224,7 +224,7 @@ export default function SettingsPanel() {
             markDirty();
           }}
           placeholder={t("settings.proxyPlaceholder")}
-          className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50"
+          className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/30"
         />
       </SettingSection>
 
@@ -240,7 +240,7 @@ export default function SettingsPanel() {
             setNpmRegistry(e.target.value);
             markDirty();
           }}
-          className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
+          className="w-full rounded-lg border border-border bg-secondary/50 px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
         >
           {NPM_REGISTRY_KEYS.map((r) => (
             <option key={r.url} value={r.url}>
@@ -267,10 +267,10 @@ export default function SettingsPanel() {
               }}
               className="peer sr-only"
             />
-            <div className="h-5 w-9 rounded-full bg-secondary transition-colors peer-checked:bg-primary" />
-            <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-foreground transition-transform peer-checked:translate-x-4" />
+            <div className="h-5 w-9 rounded-full bg-gray-300 transition-colors peer-checked:bg-primary" />
+            <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white shadow transition-transform peer-checked:translate-x-4" />
           </div>
-          <span className="text-xs">{autoSwitch ? t("settings.enabled") : t("settings.disabled")}</span>
+          <span className="text-xs text-foreground">{autoSwitch ? t("settings.enabled") : t("settings.disabled")}</span>
         </label>
       </SettingSection>
 
@@ -301,7 +301,7 @@ export default function SettingsPanel() {
           <button
             onClick={handleClearCache}
             disabled={cacheIsEmpty || clearing}
-            className="flex items-center gap-1.5 rounded-lg border border-destructive/30 px-3 py-1.5 text-[11px] font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-40"
+            className="flex items-center gap-1.5 rounded-lg border border-destructive/30 px-3 py-1.5 text-[11px] font-medium text-destructive transition-colors hover:bg-red-50 disabled:opacity-40"
           >
             {clearing ? (
               <>
@@ -338,11 +338,11 @@ function SettingSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
+    <div className="rounded-xl bg-white p-4 card-shadow">
       <div className="mb-3 flex items-center gap-2.5">
-        <span className="text-muted-foreground">{icon}</span>
+        <span className="text-primary">{icon}</span>
         <div>
-          <h3 className="text-xs font-semibold">{title}</h3>
+          <h3 className="text-xs font-semibold text-foreground">{title}</h3>
           <p className="text-[10px] text-muted-foreground">{description}</p>
         </div>
       </div>

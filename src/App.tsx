@@ -14,16 +14,18 @@ function App() {
 
   return (
     <I18nProvider>
-      <div className="flex h-screen w-screen flex-col bg-background">
+      <div className="flex h-screen w-screen flex-col">
         <TitleBar />
         <div className="flex flex-1 overflow-hidden">
           <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
-          <main className="flex-1 overflow-auto p-6">
-            {currentPage === "dashboard" && (
-              <Dashboard onNavigate={(p) => setCurrentPage(p as Page)} />
-            )}
-            {currentPage === "versions" && <VersionList />}
-            {currentPage === "settings" && <SettingsPanel />}
+          <main className="flex-1 overflow-auto bg-background">
+            <div className="mx-auto max-w-4xl p-6">
+              {currentPage === "dashboard" && (
+                <Dashboard onNavigate={(p) => setCurrentPage(p as Page)} />
+              )}
+              {currentPage === "versions" && <VersionList />}
+              {currentPage === "settings" && <SettingsPanel />}
+            </div>
           </main>
         </div>
         <StatusBar />

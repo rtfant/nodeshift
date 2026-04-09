@@ -36,7 +36,7 @@ export default function StatusBar() {
   const ltsName = currentVersion && config?.versions[currentVersion]?.lts;
 
   return (
-    <div className="flex items-center gap-4 border-t border-border bg-sidebar px-4 py-1.5 text-[10px] text-muted-foreground">
+    <div className="flex items-center gap-4 border-t border-border bg-white px-4 py-1.5 text-[10px] text-muted-foreground">
       <div className="flex items-center gap-1.5">
         <Package size={11} className={currentVersion ? "text-primary" : ""} />
         <span>

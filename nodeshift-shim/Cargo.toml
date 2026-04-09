@@ -1,6 +1,6 @@
-[package]
+﻿[package]
 name = "nodeshift-shim"
-version = "0.1.1"
+version = "0.1.2"
 description = "CLI shim for NodeShift project-level version switching"
 edition = "2021"
 

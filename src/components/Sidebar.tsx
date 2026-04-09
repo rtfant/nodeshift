@@ -19,14 +19,14 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="flex h-full w-52 flex-col bg-sidebar border-r border-border">
+    <div className="flex h-full w-52 flex-col bg-white border-r border-border">
       {/* Logo */}
       <div className="flex items-center gap-2.5 px-4 py-5">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-[0_0_12px_rgba(34,197,94,0.25)]">
-          <span className="text-xs font-extrabold text-primary-foreground">NS</span>
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-gradient shadow-md">
+          <span className="text-xs font-extrabold text-white">NS</span>
         </div>
         <div>
-          <span className="text-sm font-semibold tracking-tight">NodeShift</span>
+          <span className="text-sm font-semibold tracking-tight text-foreground">NodeShift</span>
           <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{t("sidebar.subtitle")}</p>
         </div>
       </div>
@@ -47,8 +47,8 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                   className={cn(
                     "relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
                     isActive
-                      ? "bg-sidebar-active text-primary nav-active-indicator"
-                      : "text-muted-foreground hover:bg-sidebar-active hover:text-foreground",
+                      ? "bg-primary/8 text-primary nav-active-indicator"
+                      : "text-muted-foreground hover:bg-secondary hover:text-foreground",
                   )}
                 >
                   <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
