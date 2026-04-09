@@ -40,7 +40,6 @@ export default function VersionList() {
 
   const getVersionStatus = (v: NodeVersion): string => {
     if (v.lts) {
-      // Check if there's a newer LTS with the same codename
       const major = parseInt(v.version.slice(1));
       if (major >= 22) return "Active LTS";
       if (major >= 18) return "Maintenance";
@@ -55,13 +54,13 @@ export default function VersionList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">版本管理</h1>
+        <h1 className="text-xl font-bold">版本管理</h1>
         <button
           onClick={reload}
           disabled={loading}
-          className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50"
+          className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50"
         >
-          <RefreshCw size={14} className={loading ? "animate-spin" : ""} />
+          <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
           刷新
         </button>
       </div>
@@ -73,14 +72,14 @@ export default function VersionList() {
 
       {/* Toolbar */}
       <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-1 rounded-lg bg-secondary p-1">
+        <div className="flex gap-0.5 rounded-lg bg-secondary/80 p-0.5">
           {(["lts", "current", "all"] as VersionFilter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
+              className={`rounded-md px-3.5 py-1.5 text-xs font-medium transition-all duration-150 ${
                 filter === f
-                  ? "bg-primary text-primary-foreground"
+                  ? "bg-primary text-primary-foreground shadow-sm"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
@@ -91,7 +90,7 @@ export default function VersionList() {
 
         <div className="relative">
           <Search
-            size={16}
+            size={14}
             className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground"
           />
           <input
@@ -99,17 +98,17 @@ export default function VersionList() {
             placeholder="搜索版本..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="rounded-lg border border-border bg-card py-2 pl-9 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            className="w-52 rounded-lg border border-border bg-card py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/50"
           />
         </div>
       </div>
 
       {/* Error State */}
       {error && (
-        <div className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-destructive/10 px-4 py-3 text-sm text-destructive">
-          <AlertCircle size={16} />
+        <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/5 px-4 py-3 text-xs text-destructive">
+          <AlertCircle size={14} />
           <span>{error}</span>
-          <button onClick={reload} className="ml-auto underline">
+          <button onClick={reload} className="ml-auto font-medium underline">
             重试
           </button>
         </div>
@@ -117,23 +116,25 @@ export default function VersionList() {
 
       {/* Loading State */}
       {loading && (
-        <div className="flex items-center justify-center py-16">
-          <Loader2 size={24} className="animate-spin text-primary" />
-          <span className="ml-2 text-sm text-muted-foreground">正在获取版本列表...</span>
+        <div className="flex items-center justify-center py-20">
+          <Loader2 size={20} className="animate-spin text-primary" />
+          <span className="ml-2 text-xs text-muted-foreground">正在获取版本列表...</span>
         </div>
       )}
 
       {/* Version Table */}
       {!loading && (
-        <div className="rounded-lg border border-border bg-card">
-          <div className="grid grid-cols-[1fr_120px_100px_100px_160px] gap-4 border-b border-border px-4 py-3 text-xs font-medium text-muted-foreground">
+        <div className="rounded-xl border border-border bg-card overflow-hidden">
+          {/* Table Header */}
+          <div className="grid grid-cols-[1fr_110px_90px_90px_150px] gap-4 border-b border-border bg-secondary/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
             <span>版本</span>
             <span>状态</span>
-            <span>LTS 名称</span>
-            <span>发布日期</span>
+            <span>LTS</span>
+            <span>日期</span>
             <span className="text-right">操作</span>
           </div>
 
+          {/* Table Body */}
           <div className="max-h-[calc(100vh-320px)] overflow-y-auto">
             {versions.map((v) => {
               const installed = isInstalled(v.version);
@@ -143,46 +144,59 @@ export default function VersionList() {
               return (
                 <div
                   key={v.version}
-                  className={`grid grid-cols-[1fr_120px_100px_100px_160px] items-center gap-4 border-b border-border px-4 py-3 last:border-b-0 transition-colors ${
+                  className={`grid grid-cols-[1fr_110px_90px_90px_150px] items-center gap-4 border-b border-border/60 px-4 py-2.5 last:border-b-0 table-row-hover ${
                     active
-                      ? "bg-primary/5"
-                      : "hover:bg-secondary/50"
+                      ? "bg-primary/[0.04]"
+                      : "hover:bg-secondary/40"
                   }`}
                 >
+                  {/* Version */}
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-sm font-medium">{v.version}</span>
+                    <span className="font-mono text-[13px] font-semibold">{v.version}</span>
                     {active && (
-                      <span className="rounded bg-primary/20 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                      <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
                         使用中
                       </span>
                     )}
                     {installed && !active && (
-                      <span className="rounded bg-secondary px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground">
+                      <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
                         已安装
                       </span>
                     )}
                   </div>
+
+                  {/* Status */}
                   <span>
                     <StatusBadge status={versionStatus} />
                   </span>
-                  <span className="text-sm text-muted-foreground">
+
+                  {/* LTS Name */}
+                  <span className="text-xs text-muted-foreground">
                     {v.lts || "-"}
                   </span>
-                  <span className="text-xs text-muted-foreground">{v.date}</span>
-                  <div className="flex justify-end gap-2">
+
+                  {/* Date */}
+                  <span className="text-[11px] text-muted-foreground">{v.date}</span>
+
+                  {/* Actions */}
+                  <div className="flex justify-end gap-1.5">
                     {!installed && (
                       <button
                         onClick={() => handleInstall(v)}
-                        disabled={installStatus.type !== "idle" && installStatus.type !== "completed" && installStatus.type !== "error"}
-                        className="flex items-center gap-1.5 rounded-md bg-primary px-3 py-1.5 text-xs font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+                        disabled={
+                          installStatus.type !== "idle" &&
+                          installStatus.type !== "completed" &&
+                          installStatus.type !== "error"
+                        }
+                        className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_10px_rgba(34,197,94,0.2)] disabled:opacity-50"
                       >
-                        <Download size={14} />
+                        <Download size={12} />
                         安装
                       </button>
                     )}
                     {installed && active && (
-                      <span className="flex items-center gap-1.5 rounded-md bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary">
-                        <Check size={14} />
+                      <span className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
+                        <Check size={12} />
                         使用中
                       </span>
                     )}
@@ -194,9 +208,9 @@ export default function VersionList() {
                             await switchVersion(v.version);
                             await reloadConfig();
                           }}
-                          className="flex items-center gap-1.5 rounded-md bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary/80"
+                          className="flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors hover:bg-secondary/80"
                         >
-                          <ArrowUpDown size={14} />
+                          <ArrowUpDown size={11} />
                           使用
                         </button>
                         <button
@@ -206,9 +220,9 @@ export default function VersionList() {
                             await uninstallVersion(v.version);
                             await reloadConfig();
                           }}
-                          className="flex items-center gap-1 rounded-md px-2 py-1.5 text-xs text-destructive transition-colors hover:bg-destructive/10"
+                          className="flex items-center gap-0.5 rounded-lg px-2 py-1 text-[11px] text-destructive/80 transition-colors hover:bg-destructive/10 hover:text-destructive"
                         >
-                          <Trash2 size={14} />
+                          <Trash2 size={11} />
                         </button>
                       </>
                     )}
@@ -219,7 +233,7 @@ export default function VersionList() {
           </div>
 
           {versions.length === 0 && !loading && (
-            <div className="py-12 text-center text-sm text-muted-foreground">
+            <div className="py-16 text-center text-xs text-muted-foreground">
               没有找到匹配的版本
             </div>
           )}
@@ -241,15 +255,17 @@ export default function VersionList() {
 }
 
 function StatusBadge({ status }: { status: string }) {
-  const colorMap: Record<string, string> = {
-    "Active LTS": "bg-success/10 text-success",
-    Maintenance: "bg-warning/10 text-warning",
-    Current: "bg-blue-500/10 text-blue-400",
-    EOL: "bg-destructive/10 text-destructive",
+  const styles: Record<string, string> = {
+    "Active LTS": "bg-success/10 text-success border-success/20",
+    Maintenance: "bg-warning/10 text-warning border-warning/20",
+    Current: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+    EOL: "bg-destructive/10 text-destructive border-destructive/20",
   };
   return (
     <span
-      className={`inline-block rounded-full px-2 py-0.5 text-xs ${colorMap[status] || "bg-secondary text-muted-foreground"}`}
+      className={`inline-block rounded-full border px-2 py-0.5 text-[10px] font-medium ${
+        styles[status] || "bg-secondary text-muted-foreground border-border"
+      }`}
     >
       {status}
     </span>

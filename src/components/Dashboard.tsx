@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Monitor, HardDrive, Package, Cpu, Globe, ArrowRight } from "lucide-react";
+import { Monitor, HardDrive, Package, ArrowRight, Zap } from "lucide-react";
 import { greet, getSystemInfo, getConfig } from "@/lib/tauri";
 import type { AppConfig, SystemInfo } from "@/lib/types";
 
@@ -8,28 +8,17 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
-  const [greetMsg, setGreetMsg] = useState("");
   const [ipcStatus, setIpcStatus] = useState<"testing" | "ok" | "error">("testing");
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
   const [config, setConfig] = useState<AppConfig | null>(null);
 
   useEffect(() => {
     greet("NodeShift")
-      .then((msg) => {
-        setGreetMsg(msg);
-        setIpcStatus("ok");
-      })
-      .catch(() => {
-        setIpcStatus("error");
-      });
+      .then(() => setIpcStatus("ok"))
+      .catch(() => setIpcStatus("error"));
 
-    getSystemInfo()
-      .then(setSystemInfo)
-      .catch(() => {});
-
-    getConfig()
-      .then(setConfig)
-      .catch(() => {});
+    getSystemInfo().then(setSystemInfo).catch(() => {});
+    getConfig().then(setConfig).catch(() => {});
   }, []);
 
   const installedCount = config ? Object.keys(config.versions).length : 0;
@@ -38,12 +27,28 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">仪表盘</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-xl font-bold">仪表盘</h1>
+        <div className="flex items-center gap-2">
+          <div
+            className={`h-2 w-2 rounded-full ${
+              ipcStatus === "ok"
+                ? "bg-success"
+                : ipcStatus === "error"
+                  ? "bg-destructive"
+                  : "bg-warning animate-pulse"
+            }`}
+          />
+          <span className="text-[11px] text-muted-foreground">
+            {ipcStatus === "ok" ? "IPC 正常" : ipcStatus === "error" ? "浏览器模式" : "连接中..."}
+          </span>
+        </div>
+      </div>
 
       {/* Status Cards */}
       <div className="grid grid-cols-3 gap-4">
         <StatusCard
-          icon={<Package size={20} />}
+          icon={<Package size={18} />}
           label="当前版本"
           value={currentVersion ?? "未安装"}
           sublabel={
@@ -56,83 +61,56 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
           highlight={!!currentVersion}
         />
         <StatusCard
-          icon={<HardDrive size={20} />}
+          icon={<HardDrive size={18} />}
           label="已安装版本"
           value={String(installedCount)}
           sublabel="个版本"
         />
         <StatusCard
-          icon={<Monitor size={20} />}
+          icon={<Monitor size={18} />}
           label="系统平台"
           value={
             systemInfo
-              ? `${systemInfo.platform === "macos" ? "macOS" : systemInfo.platform === "windows" ? "Windows" : "Linux"}`
+              ? systemInfo.platform === "macos"
+                ? "macOS"
+                : systemInfo.platform === "windows"
+                  ? "Windows"
+                  : "Linux"
               : "--"
           }
-          sublabel={systemInfo ? `${systemInfo.arch}` : "检测中..."}
+          sublabel={systemInfo ? systemInfo.arch : "检测中..."}
         />
       </div>
 
       {/* Current Version Detail */}
       {currentVersion && config && (
-        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-          <h2 className="mb-3 text-sm font-medium text-primary">当前活跃版本</h2>
-          <div className="grid grid-cols-2 gap-4 text-sm">
-            <div>
-              <span className="text-muted-foreground">Node.js: </span>
-              <span className="font-mono font-medium">{currentVersion}</span>
-            </div>
-            <div>
-              <span className="text-muted-foreground">路径: </span>
-              <span className="font-mono text-xs">
-                {config.versions[currentVersion]?.path ?? "-"}
-              </span>
-            </div>
-            {currentLts && (
-              <div>
-                <span className="text-muted-foreground">LTS 代号: </span>
-                <span>{currentLts}</span>
-              </div>
-            )}
-            <div>
-              <span className="text-muted-foreground">镜像源: </span>
-              <span className="text-xs">{config.mirror}</span>
-            </div>
+        <div className="rounded-xl border border-primary/15 bg-primary/[0.03] p-5 glow-primary">
+          <div className="mb-3 flex items-center gap-2">
+            <Zap size={14} className="text-primary" />
+            <h2 className="text-sm font-semibold text-primary">当前活跃版本</h2>
+          </div>
+          <div className="grid grid-cols-2 gap-3 text-sm">
+            <InfoRow label="Node.js" value={currentVersion} mono />
+            <InfoRow
+              label="路径"
+              value={config.versions[currentVersion]?.path ?? "-"}
+              mono
+              small
+            />
+            {currentLts && <InfoRow label="LTS 代号" value={currentLts} />}
+            <InfoRow label="镜像源" value={config.mirror} small />
           </div>
         </div>
       )}
 
-      {/* IPC Test */}
-      <div className="rounded-lg border border-border bg-card p-4">
-        <h2 className="mb-3 text-sm font-medium text-muted-foreground">
-          Tauri IPC 通信测试
-        </h2>
-        <div className="flex items-center gap-2">
-          <div
-            className={cn(
-              "h-2.5 w-2.5 rounded-full",
-              ipcStatus === "ok" && "bg-success",
-              ipcStatus === "error" && "bg-destructive",
-              ipcStatus === "testing" && "bg-warning animate-pulse",
-            )}
-          />
-          <span className="text-sm">
-            {ipcStatus === "testing" && "正在测试 IPC 通信..."}
-            {ipcStatus === "ok" && `IPC 通信正常: ${greetMsg}`}
-            {ipcStatus === "error" &&
-              "IPC 通信失败 (在浏览器中运行时这是正常的，需要在 Tauri 环境中测试)"}
-          </span>
-        </div>
-      </div>
-
       {/* Quick Start */}
-      <div className="rounded-lg border border-border bg-card p-4">
-        <h2 className="mb-3 text-sm font-medium text-muted-foreground">快速开始</h2>
-        <p className="text-sm text-secondary-foreground">
+      <div className="rounded-xl border border-border bg-card p-5">
+        <h2 className="mb-2 text-sm font-semibold">快速开始</h2>
+        <p className="text-[13px] text-secondary-foreground leading-relaxed">
           前往{" "}
           <button
             onClick={() => onNavigate?.("versions")}
-            className="inline-flex items-center gap-1 text-primary hover:underline"
+            className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
           >
             版本管理 <ArrowRight size={12} />
           </button>{" "}
@@ -158,22 +136,41 @@ function StatusCard({
 }) {
   return (
     <div
-      className={`rounded-lg border p-4 ${
-        highlight ? "border-primary/30 bg-primary/5" : "border-border bg-card"
+      className={`rounded-xl border p-4 transition-theme ${
+        highlight
+          ? "border-primary/20 bg-primary/[0.03] glow-primary"
+          : "border-border bg-card"
       }`}
     >
-      <div className="mb-2 flex items-center gap-2 text-muted-foreground">
+      <div className="mb-3 flex items-center gap-2 text-muted-foreground">
         {icon}
-        <span className="text-xs">{label}</span>
+        <span className="text-[11px] font-medium uppercase tracking-wide">{label}</span>
       </div>
-      <p className={`text-xl font-semibold ${highlight ? "text-primary" : ""}`}>
-        {value}
-      </p>
-      <p className="text-xs text-muted-foreground">{sublabel}</p>
+      <p className={`text-xl font-bold ${highlight ? "text-primary" : ""}`}>{value}</p>
+      <p className="mt-0.5 text-[11px] text-muted-foreground">{sublabel}</p>
     </div>
   );
 }
 
-function cn(...classes: (string | false | undefined)[]) {
-  return classes.filter(Boolean).join(" ");
+function InfoRow({
+  label,
+  value,
+  mono,
+  small,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  small?: boolean;
+}) {
+  return (
+    <div>
+      <span className="text-muted-foreground">{label}: </span>
+      <span
+        className={`${mono ? "font-mono" : ""} ${small ? "text-xs" : ""} font-medium`}
+      >
+        {value}
+      </span>
+    </div>
+  );
 }

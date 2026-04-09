@@ -35,5 +35,12 @@ chrono = { version = "0.4", features = ["serde"] }
 winreg = "0.55"
 winapi = { version = "0.3", features = ["winuser"] }
 
+[profile.release]
+strip = true
+lto = true
+codegen-units = 1
+opt-level = "s"
+panic = "abort"
+
 [features]
 custom-protocol = ["tauri/custom-protocol"]

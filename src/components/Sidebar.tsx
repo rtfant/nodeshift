@@ -16,18 +16,24 @@ const navItems: { id: Page; label: string; icon: typeof LayoutDashboard }[] = [
 
 export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
   return (
-    <div className="flex h-full w-56 flex-col border-r border-border bg-card">
+    <div className="flex h-full w-52 flex-col bg-sidebar border-r border-border">
       {/* Logo */}
-      <div className="flex items-center gap-2 border-b border-border px-4 py-4">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-          <span className="text-sm font-bold text-primary-foreground">NS</span>
+      <div className="flex items-center gap-2.5 px-4 py-5">
+        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary shadow-[0_0_12px_rgba(34,197,94,0.25)]">
+          <span className="text-xs font-extrabold text-primary-foreground">NS</span>
         </div>
-        <span className="text-lg font-semibold">NodeShift</span>
+        <div>
+          <span className="text-sm font-semibold tracking-tight">NodeShift</span>
+          <p className="text-[10px] text-muted-foreground leading-none mt-0.5">Version Manager</p>
+        </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3">
-        <ul className="space-y-1">
+      <nav className="flex-1 px-3 pt-2">
+        <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
+          导航
+        </p>
+        <ul className="space-y-0.5">
           {navItems.map((item) => {
             const Icon = item.icon;
             const isActive = currentPage === item.id;
@@ -36,13 +42,13 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                 <button
                   onClick={() => onNavigate(item.id)}
                   className={cn(
-                    "flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-colors",
+                    "relative flex w-full items-center gap-3 rounded-lg px-3 py-2 text-[13px] font-medium transition-all duration-150",
                     isActive
-                      ? "bg-primary/10 text-primary"
-                      : "text-muted-foreground hover:bg-secondary hover:text-foreground",
+                      ? "bg-sidebar-active text-primary nav-active-indicator"
+                      : "text-muted-foreground hover:bg-sidebar-active hover:text-foreground",
                   )}
                 >
-                  <Icon size={18} />
+                  <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
                   {item.label}
                 </button>
               </li>
@@ -52,8 +58,11 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-border p-3">
-        <p className="text-xs text-muted-foreground">NodeShift v0.1.0</p>
+      <div className="border-t border-border px-4 py-3">
+        <div className="flex items-center gap-2">
+          <div className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
+          <span className="text-[10px] text-muted-foreground">v0.1.0</span>
+        </div>
       </div>
     </div>
   );

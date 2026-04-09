@@ -1,21 +1,23 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0b;
+  --color-background: #09090b;
   --color-foreground: #fafafa;
-  --color-card: #141416;
+  --color-card: #111113;
   --color-card-foreground: #fafafa;
   --color-primary: #22c55e;
-  --color-primary-foreground: #0a0a0b;
-  --color-secondary: #1e1e22;
+  --color-primary-foreground: #052e16;
+  --color-secondary: #1a1a1f;
   --color-secondary-foreground: #a1a1aa;
-  --color-muted: #18181b;
+  --color-muted: #151518;
   --color-muted-foreground: #71717a;
-  --color-border: #27272a;
+  --color-border: #222226;
   --color-accent: #22c55e;
   --color-destructive: #ef4444;
   --color-success: #22c55e;
   --color-warning: #f59e0b;
+  --color-sidebar: #0c0c0e;
+  --color-sidebar-active: #161619;
 
   --font-sans: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, "Segoe UI",
     Roboto, sans-serif;
@@ -40,10 +42,22 @@ body {
   overflow: hidden;
   user-select: none;
   -webkit-user-select: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom title bar drag region */
+[data-tauri-drag-region] {
+  -webkit-app-region: drag;
+}
+
+[data-tauri-drag-region] button,
+[data-tauri-drag-region] a {
+  -webkit-app-region: no-drag;
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 
 ::-webkit-scrollbar-track {
@@ -57,4 +71,50 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-muted-foreground);
+}
+
+/* Subtle glow effect for primary elements */
+.glow-primary {
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.08);
+}
+
+/* Smooth transitions */
+.transition-theme {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Active nav indicator */
+.nav-active-indicator {
+  position: relative;
+}
+.nav-active-indicator::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 60%;
+  background: var(--color-primary);
+  border-radius: 0 3px 3px 0;
+}
+
+/* Table row hover effect */
+.table-row-hover {
+  transition: background-color 0.15s ease;
+}
+
+/* Select styling for dark mode */
+select {
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2371717a' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+select option {
+  background-color: #111113;
+  color: #fafafa;
 }

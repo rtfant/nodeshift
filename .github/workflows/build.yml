@@ -19,18 +19,23 @@ jobs:
       - run: npm run build
 
   build-tauri:
+    needs: build-frontend
     strategy:
       fail-fast: false
       matrix:
         include:
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
+            artifact_name: nodeshift-linux-x64
           - platform: macos-latest
             target: aarch64-apple-darwin
+            artifact_name: nodeshift-macos-arm64
           - platform: macos-latest
             target: x86_64-apple-darwin
+            artifact_name: nodeshift-macos-x64
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
+            artifact_name: nodeshift-windows-x64
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -60,9 +65,25 @@ jobs:
         with:
           args: --target ${{ matrix.target }}
 
-      - name: Upload artifacts
+      # Upload the raw binary as artifact (portable)
+      - name: Upload portable binary (Unix)
+        if: runner.os != 'Windows'
         uses: actions/upload-artifact@v4
         with:
-          name: nodeshift-${{ matrix.target }}
+          name: ${{ matrix.artifact_name }}-portable
+          path: src-tauri/target/${{ matrix.target }}/release/nodeshift
+
+      - name: Upload portable binary (Windows)
+        if: runner.os == 'Windows'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}-portable
+          path: src-tauri/target/${{ matrix.target }}/release/nodeshift.exe
+
+      # Upload installer artifacts
+      - name: Upload installer artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}-installer
           path: |
             src-tauri/target/${{ matrix.target }}/release/bundle/**/*

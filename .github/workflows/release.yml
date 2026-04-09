@@ -16,12 +16,24 @@ jobs:
         include:
           - platform: ubuntu-22.04
             target: x86_64-unknown-linux-gnu
+            portable_name: NodeShift-linux-x64
+            binary_name: nodeshift
+            binary_ext: ""
           - platform: macos-latest
             target: aarch64-apple-darwin
+            portable_name: NodeShift-macos-arm64
+            binary_name: nodeshift
+            binary_ext: ""
           - platform: macos-latest
             target: x86_64-apple-darwin
+            portable_name: NodeShift-macos-x64
+            binary_name: nodeshift
+            binary_ext: ""
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
+            portable_name: NodeShift-windows-x64
+            binary_name: nodeshift.exe
+            binary_ext: ".exe"
 
     runs-on: ${{ matrix.platform }}
     steps:
@@ -44,7 +56,8 @@ jobs:
 
       - run: npm ci
 
-      - name: Build and release
+      # Build Tauri app (produces both binary and installers)
+      - name: Build and release (installer)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -52,7 +65,74 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: "NodeShift ${{ github.ref_name }}"
           releaseBody: |
-            See the [CHANGELOG](https://github.com/${{ github.repository }}/blob/main/CHANGELOG.md) for details.
+            ## NodeShift ${{ github.ref_name }}
+
+            ### Portable (解压即用，无需安装)
+
+            | 平台 | 文件 |
+            |------|------|
+            | Windows x64 | `NodeShift-windows-x64.zip` |
+            | macOS ARM (Apple Silicon) | `NodeShift-macos-arm64.zip` |
+            | macOS Intel | `NodeShift-macos-x64.zip` |
+            | Linux x64 | `NodeShift-linux-x64.zip` |
+
+            ### Installer (安装包)
+
+            见下方附件 (.msi / .dmg / .deb / .AppImage)
+
+            ---
+
+            **使用方式 (Portable)**:
+            1. 下载对应平台的 .zip 文件
+            2. 解压到任意目录
+            3. 运行 `NodeShift` (macOS/Linux) 或 `NodeShift.exe` (Windows)
+
           releaseDraft: true
           prerelease: false
           args: --target ${{ matrix.target }}
+
+      # --- Create Portable zip: single exe, extract and run ---
+      - name: Create portable zip (Unix)
+        if: runner.os != 'Windows'
+        run: |
+          BINARY="src-tauri/target/${{ matrix.target }}/release/${{ matrix.binary_name }}"
+          if [ -f "$BINARY" ]; then
+            chmod +x "$BINARY"
+            # Create a temp dir with a clean name
+            mkdir -p _portable
+            cp "$BINARY" "_portable/NodeShift${{ matrix.binary_ext }}"
+            cd _portable
+            zip -9 "../${{ matrix.portable_name }}.zip" "NodeShift${{ matrix.binary_ext }}"
+            cd ..
+            rm -rf _portable
+          else
+            echo "::error::Binary not found at $BINARY"
+            ls -la "src-tauri/target/${{ matrix.target }}/release/" || true
+            exit 1
+          fi
+
+      - name: Create portable zip (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $binary = "src-tauri/target/${{ matrix.target }}/release/${{ matrix.binary_name }}"
+          if (Test-Path $binary) {
+            # Create portable folder with clean name
+            New-Item -ItemType Directory -Path "_portable" -Force
+            Copy-Item $binary "_portable/NodeShift.exe"
+            Compress-Archive -Path "_portable/NodeShift.exe" -DestinationPath "${{ matrix.portable_name }}.zip" -CompressionLevel Optimal
+            Remove-Item -Recurse -Force "_portable"
+          } else {
+            Write-Error "Binary not found at $binary"
+            Get-ChildItem "src-tauri/target/${{ matrix.target }}/release/" -ErrorAction SilentlyContinue
+            exit 1
+          }
+
+      - name: Upload portable zip to release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.portable_name }}.zip
+          tag_name: ${{ github.ref_name }}
+          draft: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

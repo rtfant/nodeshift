@@ -28,13 +28,13 @@ export default function InstallDialog({
   const [mirror, setMirror] = useState(defaultMirror);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-      <div className="w-[480px] rounded-xl border border-border bg-card shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
+      <div className="w-[460px] rounded-2xl border border-border bg-card shadow-2xl shadow-black/40">
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-border px-6 py-4">
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <h2 className="text-lg font-semibold">安装 Node.js</h2>
-            <p className="text-sm text-muted-foreground">
+            <h2 className="text-base font-semibold">安装 Node.js</h2>
+            <p className="mt-0.5 text-xs text-muted-foreground">
               {version.version}
               {version.lts ? ` (${version.lts} LTS)` : " (Current)"}
             </p>
@@ -43,16 +43,16 @@ export default function InstallDialog({
             onClick={onCancel}
             className="rounded-lg p-1.5 text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
         {/* Body */}
-        <div className="space-y-4 px-6 py-5">
+        <div className="space-y-4 px-5 py-4">
           {/* Install Path */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
-              <FolderOpen size={14} className="text-muted-foreground" />
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold">
+              <FolderOpen size={13} className="text-muted-foreground" />
               安装路径
             </label>
             <div className="flex gap-2">
@@ -60,27 +60,27 @@ export default function InstallDialog({
                 type="text"
                 value={installDir}
                 onChange={(e) => setInstallDir(e.target.value)}
-                className="flex-1 rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+                className="flex-1 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
               />
-              <button className="rounded-lg border border-border bg-secondary px-3 py-2 text-sm text-foreground transition-colors hover:bg-secondary/80">
+              <button className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-secondary/80">
                 浏览
               </button>
             </div>
-            <p className="mt-1 text-xs text-muted-foreground">
-              版本将安装到: {installDir}/versions/{version.version}
+            <p className="mt-1 text-[10px] text-muted-foreground">
+              安装到: {installDir}/versions/{version.version}
             </p>
           </div>
 
           {/* Mirror */}
           <div>
-            <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium">
-              <Globe size={14} className="text-muted-foreground" />
+            <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold">
+              <Globe size={13} className="text-muted-foreground" />
               镜像源
             </label>
             <select
               value={mirror}
               onChange={(e) => setMirror(e.target.value)}
-              className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+              className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
             >
               {MIRRORS.map((m) => (
                 <option key={m.url} value={m.url}>
@@ -91,42 +91,44 @@ export default function InstallDialog({
           </div>
 
           {/* Version Info */}
-          <div className="rounded-lg bg-muted p-3">
-            <h4 className="mb-2 text-xs font-medium text-muted-foreground">版本详情</h4>
-            <div className="grid grid-cols-2 gap-1.5 text-xs">
+          <div className="rounded-lg bg-muted/80 p-3">
+            <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+              版本详情
+            </h4>
+            <div className="grid grid-cols-2 gap-1.5 text-[11px]">
               <div>
                 <span className="text-muted-foreground">npm: </span>
-                <span>{version.npm || "-"}</span>
+                <span className="font-medium">{version.npm || "-"}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">V8: </span>
-                <span>{version.v8 || "-"}</span>
+                <span className="font-medium">{version.v8 || "-"}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">发布日期: </span>
-                <span>{version.date}</span>
+                <span className="font-medium">{version.date}</span>
               </div>
               <div>
                 <span className="text-muted-foreground">OpenSSL: </span>
-                <span>{version.openssl || "-"}</span>
+                <span className="font-medium">{version.openssl || "-"}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end gap-3 border-t border-border px-6 py-4">
+        <div className="flex justify-end gap-2 border-t border-border px-5 py-3">
           <button
             onClick={onCancel}
-            className="rounded-lg border border-border px-4 py-2 text-sm text-foreground transition-colors hover:bg-secondary"
+            className="rounded-lg border border-border px-4 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
           >
             取消
           </button>
           <button
             onClick={() => onConfirm(installDir, mirror)}
-            className="flex items-center gap-2 rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_12px_rgba(34,197,94,0.2)]"
           >
-            <Download size={16} />
+            <Download size={13} />
             开始安装
           </button>
         </div>

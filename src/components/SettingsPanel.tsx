@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { FolderOpen, Globe, Shield, Package, Save, RotateCcw, Trash2 } from "lucide-react";
+import {
+  FolderOpen,
+  Globe,
+  Shield,
+  Package,
+  Save,
+  RotateCcw,
+  Trash2,
+  RefreshCw,
+} from "lucide-react";
 import { useConfig } from "@/hooks/useConfig";
 
 const MIRRORS = [
@@ -27,7 +36,6 @@ export default function SettingsPanel() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
-  // Sync local state from config
   useEffect(() => {
     if (config) {
       setInstallDir(config.installDir);
@@ -72,32 +80,37 @@ export default function SettingsPanel() {
 
   if (loading || !config) {
     return (
-      <div className="flex items-center justify-center py-16 text-sm text-muted-foreground">
+      <div className="flex items-center justify-center py-20 text-xs text-muted-foreground">
+        <RefreshCw size={14} className="mr-2 animate-spin" />
         加载设置中...
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">设置</h1>
+        <h1 className="text-xl font-bold">设置</h1>
         <div className="flex gap-2">
           {dirty && (
             <button
               onClick={handleReset}
-              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-sm text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
+              className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              <RotateCcw size={14} />
+              <RotateCcw size={13} />
               重置
             </button>
           )}
           <button
             onClick={handleSave}
             disabled={!dirty || saving}
-            className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90 disabled:opacity-50"
+            className={`flex items-center gap-1.5 rounded-lg px-4 py-1.5 text-xs font-semibold transition-all disabled:opacity-40 ${
+              saved
+                ? "bg-success/10 text-success border border-success/20"
+                : "bg-primary text-primary-foreground hover:bg-primary/90"
+            }`}
           >
-            <Save size={14} />
+            <Save size={13} />
             {saving ? "保存中..." : saved ? "已保存" : "保存设置"}
           </button>
         </div>
@@ -105,7 +118,7 @@ export default function SettingsPanel() {
 
       {/* Install Path */}
       <SettingSection
-        icon={<FolderOpen size={18} />}
+        icon={<FolderOpen size={16} />}
         title="安装路径"
         description="Node.js 版本的存储位置"
       >
@@ -113,28 +126,34 @@ export default function SettingsPanel() {
           <input
             type="text"
             value={installDir}
-            onChange={(e) => { setInstallDir(e.target.value); markDirty(); }}
-            className="flex-1 rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+            onChange={(e) => {
+              setInstallDir(e.target.value);
+              markDirty();
+            }}
+            className="flex-1 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary/50"
           />
-          <button className="rounded-lg border border-border bg-secondary px-4 py-2 text-sm text-foreground transition-colors hover:bg-secondary/80">
+          <button className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary/80">
             浏览
           </button>
         </div>
-        <p className="mt-1 text-xs text-muted-foreground">
-          版本存储于: {installDir}/versions/
+        <p className="mt-1 text-[10px] text-muted-foreground font-mono">
+          {installDir}/versions/
         </p>
       </SettingSection>
 
       {/* Mirror Source */}
       <SettingSection
-        icon={<Globe size={18} />}
+        icon={<Globe size={16} />}
         title="镜像源"
         description="下载 Node.js 时使用的镜像源，国内用户建议选择淘宝源"
       >
         <select
           value={mirror}
-          onChange={(e) => { setMirror(e.target.value); markDirty(); }}
-          className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          onChange={(e) => {
+            setMirror(e.target.value);
+            markDirty();
+          }}
+          className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
         >
           {MIRRORS.map((m) => (
             <option key={m.url} value={m.url}>
@@ -146,29 +165,35 @@ export default function SettingsPanel() {
 
       {/* Proxy */}
       <SettingSection
-        icon={<Shield size={18} />}
+        icon={<Shield size={16} />}
         title="代理设置"
         description="如果需要通过代理下载，请配置代理地址"
       >
         <input
           type="text"
           value={proxy}
-          onChange={(e) => { setProxy(e.target.value); markDirty(); }}
+          onChange={(e) => {
+            setProxy(e.target.value);
+            markDirty();
+          }}
           placeholder="例如: http://127.0.0.1:7890"
-          className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50"
         />
       </SettingSection>
 
       {/* npm Registry */}
       <SettingSection
-        icon={<Package size={18} />}
+        icon={<Package size={16} />}
         title="npm 源"
         description="npm install 时使用的 registry"
       >
         <select
           value={npmRegistry}
-          onChange={(e) => { setNpmRegistry(e.target.value); markDirty(); }}
-          className="w-full rounded-lg border border-border bg-muted px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+          onChange={(e) => {
+            setNpmRegistry(e.target.value);
+            markDirty();
+          }}
+          className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
         >
           {NPM_REGISTRIES.map((r) => (
             <option key={r.url} value={r.url}>
@@ -180,37 +205,40 @@ export default function SettingsPanel() {
 
       {/* Auto Switch */}
       <SettingSection
-        icon={<Package size={18} />}
+        icon={<RefreshCw size={16} />}
         title="自动切换"
-        description="进入包含 .nvmrc 或 .node-version 文件的项目时自动切换 Node.js 版本"
+        description="进入包含 .nvmrc 或 .node-version 文件的项目时自动切换版本"
       >
         <label className="flex cursor-pointer items-center gap-3">
           <div className="relative">
             <input
               type="checkbox"
               checked={autoSwitch}
-              onChange={(e) => { setAutoSwitch(e.target.checked); markDirty(); }}
+              onChange={(e) => {
+                setAutoSwitch(e.target.checked);
+                markDirty();
+              }}
               className="peer sr-only"
             />
-            <div className="h-6 w-11 rounded-full bg-secondary peer-checked:bg-primary transition-colors" />
-            <div className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-foreground transition-transform peer-checked:translate-x-5" />
+            <div className="h-5 w-9 rounded-full bg-secondary transition-colors peer-checked:bg-primary" />
+            <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-foreground transition-transform peer-checked:translate-x-4" />
           </div>
-          <span className="text-sm">{autoSwitch ? "已启用" : "已关闭"}</span>
+          <span className="text-xs">{autoSwitch ? "已启用" : "已关闭"}</span>
         </label>
       </SettingSection>
 
-      {/* Cache management */}
+      {/* Cache Management */}
       <SettingSection
-        icon={<Trash2 size={18} />}
+        icon={<Trash2 size={16} />}
         title="缓存管理"
         description="清理已下载的 Node.js 压缩包缓存"
       >
         <div className="flex items-center justify-between">
-          <span className="text-sm text-muted-foreground">
-            缓存目录: {installDir}/cache/
+          <span className="text-[10px] text-muted-foreground font-mono">
+            {installDir}/cache/
           </span>
-          <button className="flex items-center gap-1.5 rounded-lg border border-destructive/50 px-3 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/10">
-            <Trash2 size={14} />
+          <button className="flex items-center gap-1.5 rounded-lg border border-destructive/30 px-3 py-1.5 text-[11px] font-medium text-destructive transition-colors hover:bg-destructive/10">
+            <Trash2 size={12} />
             清理缓存
           </button>
         </div>
@@ -231,12 +259,12 @@ function SettingSection({
   children: React.ReactNode;
 }) {
   return (
-    <div className="rounded-lg border border-border bg-card p-4">
-      <div className="mb-3 flex items-center gap-2">
+    <div className="rounded-xl border border-border bg-card p-4">
+      <div className="mb-3 flex items-center gap-2.5">
         <span className="text-muted-foreground">{icon}</span>
         <div>
-          <h3 className="text-sm font-medium">{title}</h3>
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <h3 className="text-xs font-semibold">{title}</h3>
+          <p className="text-[10px] text-muted-foreground">{description}</p>
         </div>
       </div>
       {children}

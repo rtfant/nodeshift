@@ -4,6 +4,7 @@ import Dashboard from "./components/Dashboard";
 import VersionList from "./components/VersionList";
 import SettingsPanel from "./components/SettingsPanel";
 import StatusBar from "./components/StatusBar";
+import TitleBar from "./components/TitleBar";
 
 type Page = "dashboard" | "versions" | "settings";
 
@@ -12,6 +13,7 @@ function App() {
 
   return (
     <div className="flex h-screen w-screen flex-col bg-background">
+      <TitleBar />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
         <main className="flex-1 overflow-auto p-6">
