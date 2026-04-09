@@ -1,4 +1,4 @@
-import { useState, useCallback, createContext, useContext, type ReactNode } from "react";
+import { useState, useCallback, createContext, useContext, createElement, type ReactNode } from "react";
 import zhCN from "./zh-CN.json";
 import enUS from "./en-US.json";
 
@@ -51,7 +51,7 @@ export const I18nContext = createContext<I18nContextValue | null>(null);
 
 export function I18nProvider({ children }: { children: ReactNode }) {
   const value = useI18n();
-  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+  return createElement(I18nContext.Provider, { value }, children);
 }
 
 export function useTranslation() {

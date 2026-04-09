@@ -1,7 +1,7 @@
-﻿{
+{
   "$schema": "https://raw.githubusercontent.com/nicehash/tauri/dev/crates/tauri-config-schema/schema.json",
   "productName": "NodeShift",
-  "version": "0.1.2",
+  "version": "0.1.0",
   "identifier": "com.nodeshift.app",
   "build": {
     "beforeDevCommand": "npm run dev",
