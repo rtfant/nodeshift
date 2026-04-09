@@ -2,8 +2,7 @@
 
 use anyhow::{Context, Result};
 use sha2::{Digest, Sha256};
-use std::io::Write;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use tokio::io::AsyncWriteExt;
 
 /// Download progress callback data

@@ -3,7 +3,7 @@
 //! Walks up the directory tree from a given path to find version pinning files.
 
 use anyhow::Result;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 
 /// Version file names to search for, in priority order
 const VERSION_FILES: &[&str] = &[".node-version", ".nvmrc"];
