@@ -10,7 +10,6 @@
     "frontendDist": "../dist"
   },
   "app": {
-    "title": "NodeShift",
     "windows": [
       {
         "title": "NodeShift - Node.js Version Manager",
