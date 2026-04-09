@@ -1,0 +1,30 @@
+import { useState } from "react";
+import Sidebar from "./components/Sidebar";
+import Dashboard from "./components/Dashboard";
+import VersionList from "./components/VersionList";
+import SettingsPanel from "./components/SettingsPanel";
+import StatusBar from "./components/StatusBar";
+
+type Page = "dashboard" | "versions" | "settings";
+
+function App() {
+  const [currentPage, setCurrentPage] = useState<Page>("dashboard");
+
+  return (
+    <div className="flex h-screen w-screen flex-col bg-background">
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar currentPage={currentPage} onNavigate={setCurrentPage} />
+        <main className="flex-1 overflow-auto p-6">
+          {currentPage === "dashboard" && (
+            <Dashboard onNavigate={(p) => setCurrentPage(p as Page)} />
+          )}
+          {currentPage === "versions" && <VersionList />}
+          {currentPage === "settings" && <SettingsPanel />}
+        </main>
+      </div>
+      <StatusBar />
+    </div>
+  );
+}
+
+export default App;

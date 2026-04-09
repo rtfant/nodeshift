@@ -1,0 +1,21 @@
+[package]
+name = "nodeshift-shim"
+version = "0.1.0"
+description = "CLI shim for NodeShift project-level version switching"
+edition = "2021"
+
+[[bin]]
+name = "node"
+path = "src/main.rs"
+
+[[bin]]
+name = "npm"
+path = "src/main.rs"
+
+[[bin]]
+name = "npx"
+path = "src/main.rs"
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
