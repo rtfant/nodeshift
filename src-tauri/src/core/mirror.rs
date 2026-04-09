@@ -3,6 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[allow(dead_code)]
 pub struct MirrorSource {
     pub name: String,
     pub url: String,
@@ -10,6 +11,7 @@ pub struct MirrorSource {
 }
 
 /// Built-in mirror sources
+#[allow(dead_code)]
 pub fn builtin_mirrors() -> Vec<MirrorSource> {
     vec![
         MirrorSource {
@@ -47,6 +49,7 @@ pub fn build_checksum_url(mirror: &str, version: &str) -> String {
 }
 
 /// Build version list URL for the mirror
+#[allow(dead_code)]
 pub fn build_version_list_url(mirror: &str) -> String {
     format!("{}index.json", mirror.trim_end_matches('/').trim_end_matches("dist").trim_end_matches('/'))
 }

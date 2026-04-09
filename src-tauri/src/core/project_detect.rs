@@ -11,6 +11,7 @@ const VERSION_FILES: &[&str] = &[".node-version", ".nvmrc"];
 /// Detect project-level Node.js version requirement.
 /// Walks up from the given directory to find .nvmrc or .node-version.
 /// Returns the version string (e.g. "v22.15.0" or "22.15.0") if found.
+#[allow(dead_code)]
 pub fn detect_project_version(dir: &Path) -> Result<Option<String>> {
     let mut current = dir.to_path_buf();
 

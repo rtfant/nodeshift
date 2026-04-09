@@ -184,6 +184,7 @@ pub async fn uninstall_version(version: &str, install_dir: &Path) -> Result<()> 
 }
 
 /// List all installed versions by scanning the versions directory
+#[allow(dead_code)]
 pub fn list_installed(install_dir: &Path) -> Result<Vec<String>> {
     let versions_dir = install_dir.join("versions");
     let mut versions = Vec::new();

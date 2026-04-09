@@ -11,6 +11,7 @@ use anyhow::Result;
 use std::path::PathBuf;
 
 /// Platform-agnostic interface for OS-specific operations
+#[allow(dead_code)]
 pub trait PlatformOps {
     /// Add NodeShift to system PATH
     fn add_to_path(nodeshift_dir: &PathBuf) -> Result<()>;

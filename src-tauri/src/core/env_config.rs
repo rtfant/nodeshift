@@ -40,6 +40,7 @@ pub fn remove_path(nodeshift_dir: &Path) -> Result<()> {
 }
 
 /// Create a symlink/junction from current -> target version
+#[allow(dead_code)]
 pub fn create_version_link(nodeshift_dir: &Path, version: &str) -> Result<()> {
     let current_link = nodeshift_dir.join("current");
     let target = nodeshift_dir.join("versions").join(version);

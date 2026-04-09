@@ -6,6 +6,7 @@ use std::path::Path;
 use tokio::io::AsyncWriteExt;
 
 /// Download progress callback data
+#[allow(dead_code)]
 pub struct DownloadProgress {
     pub downloaded: u64,
     pub total: u64,

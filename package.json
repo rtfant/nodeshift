@@ -1,6 +1,6 @@
 {
   "name": "nodeshift",
-  "version": "0.1.4",
+  "version": "0.1.0",
   "description": "Cross-platform Node.js version manager with GUI",
   "type": "module",
   "scripts": {
