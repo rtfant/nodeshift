@@ -2,7 +2,7 @@
 
 > Generated: 2026-04-09
 > Version: 0.1.0
-> Status: MVP complete, ready for build
+> Status: All planned features implemented
 
 ---
 
@@ -27,6 +27,11 @@ NodeShift is a cross-platform, portable, GUI-based Node.js version manager built
 3. **Dark theme only** (initial release): Color tokens defined in `globals.css` via `@theme`. Primary green (#22c55e), deep dark background (#09090b).
 4. **Browser mock mode**: `src/lib/tauri.ts` detects Tauri runtime; falls back to mock IPC for browser-based development.
 5. **Mirror acceleration**: Built-in support for npmmirror, Huawei, Tencent mirrors for users in China.
+6. **Full i18n**: All UI strings resolved via `useTranslation()` hook with `I18nProvider` context. Supports en-US and zh-CN.
+7. **System tray**: Close-to-tray with tray menu (Show/Quit). Window hidden on close, restored on tray click.
+8. **Auto-update**: Tauri Updater plugin with status bar indicator and one-click download+install.
+9. **Code signing**: macOS notarization + Windows signing configured in CI pipeline.
+10. **Cache management**: Display cache size/count + one-click cleanup in settings.
 
 ---
 
@@ -35,73 +40,81 @@ NodeShift is a cross-platform, portable, GUI-based Node.js version manager built
 ```
 nodeshift/
 ├── .github/workflows/
-│   ├── build.yml                  # CI: build + test (4 targets)
-│   └── release.yml                # CD: release + portable zip (4 targets)
-├── nodeshift-shim/                # CLI shim for project-level auto-switch
+│   ├── build.yml
+│   └── release.yml                # Code signing + updater signing
+├── nodeshift-shim/
 │   ├── Cargo.toml
 │   └── src/main.rs
-├── src-tauri/                     # Rust backend
-│   ├── Cargo.toml                 # Dependencies + release profile
-│   ├── tauri.conf.json            # App config, bundle targets, window settings
+├── src-tauri/
+│   ├── Cargo.toml                 # tray-icon feature + tauri-plugin-updater
+│   ├── tauri.conf.json            # dialog + updater + macOS bundle config
 │   ├── build.rs
-│   ├── icons/                     # App icons (PNG/ICO/ICNS)
+│   ├── icons/
 │   └── src/
-│       ├── main.rs                # Entry point
-│       ├── lib.rs                 # Tauri builder + command registration
+│       ├── main.rs
+│       ├── lib.rs                 # Tray icon + hide-on-close + updater plugin
 │       ├── commands/
-│       │   ├── mod.rs             # Re-exports + greet command
-│       │   ├── version.rs         # fetch/install/switch/uninstall/detect
-│       │   ├── config.rs          # AppConfig load/save
-│       │   └── system.rs          # OS/arch detection
+│       │   ├── mod.rs             # Re-exports + greet + cache module
+│       │   ├── cache.rs           # get_cache_info + clear_cache
+│       │   ├── version.rs
+│       │   ├── config.rs
+│       │   └── system.rs
 │       ├── core/
 │       │   ├── mod.rs
-│       │   ├── downloader.rs      # Streaming download + SHA256 verify
-│       │   ├── extractor.rs       # tar.xz / zip / tar.gz extraction
-│       │   ├── version_manager.rs # Install/switch/uninstall logic
-│       │   ├── env_config.rs      # PATH/shell config management
-│       │   ├── mirror.rs          # Mirror URL builder
-│       │   └── project_detect.rs  # .nvmrc / .node-version detection
+│       │   ├── downloader.rs
+│       │   ├── extractor.rs
+│       │   ├── version_manager.rs
+│       │   ├── env_config.rs
+│       │   ├── mirror.rs
+│       │   └── project_detect.rs
 │       └── platform/
-│           ├── mod.rs             # PlatformOps trait
-│           ├── windows.rs         # Registry + WM_SETTINGCHANGE
-│           ├── macos.rs           # Symlink + .zshrc
-│           └── linux.rs           # Symlink + shell config
-├── src/                           # React frontend
-│   ├── main.tsx                   # React entry
-│   ├── App.tsx                    # Root layout (TitleBar + Sidebar + Pages + StatusBar)
+│           ├── mod.rs
+│           ├── windows.rs
+│           ├── macos.rs
+│           └── linux.rs
+├── src/
+│   ├── main.tsx
+│   ├── App.tsx                    # Wrapped in I18nProvider
 │   ├── components/
-│   │   ├── TitleBar.tsx           # Custom window title bar with drag + controls
-│   │   ├── Sidebar.tsx            # Left nav with active indicator
-│   │   ├── Dashboard.tsx          # Overview: status cards + active version
-│   │   ├── VersionList.tsx        # Version table with filter/search/actions
-│   │   ├── InstallDialog.tsx      # Install confirmation modal
-│   │   ├── ProgressBar.tsx        # Download/install progress
-│   │   ├── SettingsPanel.tsx      # All settings with save/reset
-│   │   └── StatusBar.tsx          # Bottom bar: version/count/platform
+│   │   ├── TitleBar.tsx
+│   │   ├── Sidebar.tsx            # i18n wired
+│   │   ├── Dashboard.tsx          # i18n wired
+│   │   ├── VersionList.tsx        # i18n wired
+│   │   ├── InstallDialog.tsx      # i18n + native dialog picker
+│   │   ├── ProgressBar.tsx        # i18n wired
+│   │   ├── SettingsPanel.tsx      # i18n + native dialog + cache management
+│   │   └── StatusBar.tsx          # i18n + update status indicator
 │   ├── hooks/
-│   │   ├── useVersions.ts         # Version list fetch + filter
-│   │   ├── useConfig.ts           # Config state management
-│   │   └── useInstall.ts          # Install state machine
+│   │   ├── useVersions.ts
+│   │   ├── useConfig.ts
+│   │   ├── useInstall.ts
+│   │   └── useUpdater.ts          # Auto-update hook
 │   ├── lib/
-│   │   ├── tauri.ts               # Tauri IPC wrapper + browser mock
-│   │   ├── types.ts               # TypeScript type definitions
-│   │   └── cn.ts                  # Class name utility
+│   │   ├── tauri.ts               # pickFolder + getCacheInfo + clearCache
+│   │   ├── types.ts
+│   │   └── cn.ts
 │   ├── styles/
-│   │   └── globals.css            # Tailwind v4 + dark theme tokens
+│   │   └── globals.css
 │   ├── i18n/
-│   │   ├── index.ts               # i18n hook + context
-│   │   ├── zh-CN.json             # Chinese translations
-│   │   └── en-US.json             # English translations
+│   │   ├── index.ts               # I18nProvider + useTranslation
+│   │   ├── zh-CN.json             # Full Chinese translations
+│   │   └── en-US.json             # Full English translations
 │   └── vite-env.d.ts
-├── package.json                   # npm dependencies + scripts
-├── tsconfig.json                  # TypeScript config
-├── tsconfig.node.json             # Vite config TS
-├── vite.config.ts                 # Vite + React + Tailwind
-├── index.html                     # HTML shell
+├── package.json                   # Added @tauri-apps/plugin-updater
+├── tsconfig.json
+├── tsconfig.node.json
+├── vite.config.ts
+├── index.html
 ├── .gitignore
 ├── README.md
-├── DESIGN.md                      # Full design document (v2.0)
-└── PROJECT-SNAPSHOT.md            # This file
+├── DESIGN.md
+├── PROJECT-SNAPSHOT.md
+├── SNAPSHOT-STEP1-i18n.md
+├── SNAPSHOT-STEP2-dialog.md
+├── SNAPSHOT-STEP3-tray.md
+├── SNAPSHOT-STEP4-updater.md
+├── SNAPSHOT-STEP5-codesign.md
+└── SNAPSHOT-STEP6-cache.md
 ```
 
 ---
@@ -120,6 +133,27 @@ nodeshift/
 | `save_config` | `config: AppConfig` | - | Write config.json |
 | `get_system_info` | - | `SystemInfo` | OS, arch, platform |
 | `detect_project_version` | `dir: String` | `Option<ProjectVersionInfo>` | Check .nvmrc/.node-version |
+| `get_cache_info` | - | `CacheInfo` | Get cache dir path, size, file count |
+| `clear_cache` | - | `CacheInfo` | Delete all cache files, return empty info |
+
+### Frontend-only APIs
+
+| Function | Description |
+|----------|-------------|
+| `pickFolder(defaultPath?)` | Opens native folder picker via `@tauri-apps/plugin-dialog` |
+
+---
+
+## All Features Complete
+
+All 6 planned "Next Steps" have been implemented:
+
+1. **i18n** - Full bilingual support (en-US / zh-CN) wired into all components
+2. **Directory picker** - Native OS folder picker for install path selection
+3. **System tray** - Close-to-tray behavior with tray menu (Show / Quit)
+4. **Auto-update** - Tauri Updater plugin with status bar indicator
+5. **Code signing** - macOS notarization + Windows signing in CI pipeline
+6. **Cache management** - Display cache size/count + one-click cleanup
 
 ---
 
@@ -142,31 +176,6 @@ npm run tauri build -- --target x86_64-apple-darwin
 npm run tauri build -- --target x86_64-unknown-linux-gnu
 ```
 
-Output binary location: `src-tauri/target/{target}/release/nodeshift[.exe]`
-
----
-
-## GitHub Actions
-
-### `build.yml` (CI)
-- Triggers: push to main/develop, PRs to main
-- Matrix: 4 targets (Linux x64, macOS ARM, macOS x64, Windows x64)
-- Uploads: portable binary + installer artifacts
-
-### `release.yml` (CD)
-- Triggers: push `v*` tags
-- Creates draft GitHub Release with:
-  - Portable zip per platform (single exe, extract and run)
-  - Installer per platform (.msi, .dmg, .deb, .AppImage)
-
-### Release workflow:
-```bash
-git tag v0.1.0
-git push origin v0.1.0
-# -> GitHub Actions builds 4 platforms
-# -> Draft release created with portable zips + installers
-```
-
 ---
 
 ## Binary Size Optimization
@@ -181,14 +190,3 @@ panic = "abort"     # No unwinding, smaller binary
 ```
 
 Expected portable binary size: ~8-12MB (varies by platform).
-
----
-
-## Next Steps (not yet implemented)
-
-- [ ] Wire i18n translations into components (infrastructure ready, strings hardcoded)
-- [ ] Implement native directory picker via `tauri-plugin-dialog`
-- [ ] System tray mode
-- [ ] Auto-update via Tauri Updater plugin
-- [ ] Code signing (Windows/macOS)
-- [ ] Cache size display and cleanup functionality

@@ -96,6 +96,20 @@ async function mockInvoke<T>(cmd: string, args?: Record<string, unknown>): Promi
     case "get_current_version":
       return (mockConfig.currentVersion ?? null) as T;
 
+    case "get_cache_info":
+      return {
+        cacheDir: `${mockConfig.installDir}/cache`,
+        totalSize: 52428800,
+        fileCount: 3,
+      } as T;
+
+    case "clear_cache":
+      return {
+        cacheDir: `${mockConfig.installDir}/cache`,
+        totalSize: 0,
+        fileCount: 0,
+      } as T;
+
     default:
       console.warn(`Unknown mock command: ${cmd}`);
       return undefined as T;
@@ -167,4 +181,27 @@ export async function detectProjectVersion(dir: string): Promise<ProjectVersionI
 
 export async function greet(name: string): Promise<string> {
   return tauriInvoke("greet", { name });
+}
+
+export interface CacheInfo {
+  cacheDir: string;
+  totalSize: number;
+  fileCount: number;
+}
+
+export async function getCacheInfo(): Promise<CacheInfo> {
+  return tauriInvoke("get_cache_info");
+}
+
+export async function clearCache(): Promise<CacheInfo> {
+  return tauriInvoke("clear_cache");
+}
+
+export async function pickFolder(defaultPath?: string): Promise<string | null> {
+  if (isTauri) {
+    const { open } = await import("@tauri-apps/plugin-dialog");
+    const selected = await open({ directory: true, multiple: false, defaultPath });
+    return selected as string | null;
+  }
+  return null;
 }

@@ -1,4 +1,4 @@
-import { useState, useCallback, createContext, useContext } from "react";
+import { useState, useCallback, createContext, useContext, type ReactNode } from "react";
 import zhCN from "./zh-CN.json";
 import enUS from "./en-US.json";
 
@@ -49,11 +49,15 @@ interface I18nContextValue {
 
 export const I18nContext = createContext<I18nContextValue | null>(null);
 
+export function I18nProvider({ children }: { children: ReactNode }) {
+  const value = useI18n();
+  return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
+}
+
 export function useTranslation() {
   const ctx = useContext(I18nContext);
   if (!ctx) {
-    // Fallback: direct usage without provider
-    return useI18n();
+    throw new Error("useTranslation must be used within an I18nProvider");
   }
   return ctx;
 }

@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/nicehash/tauri/dev/crates/tauri-config-schema/schema.json",
   "productName": "NodeShift",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "identifier": "com.nodeshift.app",
   "build": {
     "beforeDevCommand": "npm run dev",
@@ -43,11 +43,22 @@
         "displayLanguageSelector": false
       }
     },
-    "resources": []
+    "resources": [],
+    "macOS": {
+      "signingIdentity": null,
+      "entitlements": null
+    }
   },
   "plugins": {
     "shell": {
       "open": true
+    },
+    "dialog": {
+      "open": true
+    },
+    "updater": {
+      "endpoints": ["https://github.com/nicehash/nodeshift/releases/latest/download/latest.json"],
+      "pubkey": ""
     }
   }
 }

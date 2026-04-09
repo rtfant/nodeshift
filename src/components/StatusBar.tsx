@@ -1,9 +1,13 @@
 import { useState, useEffect } from "react";
-import { Package, HardDrive, Cpu } from "lucide-react";
+import { Package, HardDrive, Cpu, Loader2, ArrowDownCircle, CheckCircle2 } from "lucide-react";
 import { getCurrentVersion, getConfig, getSystemInfo } from "@/lib/tauri";
+import { useTranslation } from "@/i18n";
+import { useUpdater } from "@/hooks/useUpdater";
 import type { AppConfig, SystemInfo } from "@/lib/types";
 
 export default function StatusBar() {
+  const { t } = useTranslation();
+  const { status: updateStatus, updateInfo, downloadAndInstall } = useUpdater();
   const [currentVersion, setCurrentVersion] = useState<string | null>(null);
   const [config, setConfig] = useState<AppConfig | null>(null);
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
@@ -42,7 +46,7 @@ export default function StatusBar() {
               {ltsName && <span className="ml-1 opacity-70">({ltsName})</span>}
             </>
           ) : (
-            "未安装"
+            t("statusBar.notInstalled")
           )}
         </span>
       </div>
@@ -51,7 +55,7 @@ export default function StatusBar() {
 
       <div className="flex items-center gap-1.5">
         <HardDrive size={11} />
-        <span>{installedCount} 个版本</span>
+        <span>{t("statusBar.versionsCount", { count: String(installedCount) })}</span>
       </div>
 
       <div className="h-2.5 w-px bg-border" />
@@ -65,8 +69,49 @@ export default function StatusBar() {
         </span>
       </div>
 
+      {/* Update status indicator */}
+      {updateStatus === "checking" && (
+        <>
+          <div className="h-2.5 w-px bg-border" />
+          <div className="flex items-center gap-1.5 text-muted-foreground">
+            <Loader2 size={11} className="animate-spin" />
+            <span>{t("updater.checking")}</span>
+          </div>
+        </>
+      )}
+      {updateStatus === "available" && updateInfo && (
+        <>
+          <div className="h-2.5 w-px bg-border" />
+          <button
+            onClick={downloadAndInstall}
+            className="flex items-center gap-1.5 text-primary hover:underline"
+          >
+            <ArrowDownCircle size={11} />
+            <span>{t("updater.available", { version: updateInfo.version })}</span>
+          </button>
+        </>
+      )}
+      {updateStatus === "downloading" && (
+        <>
+          <div className="h-2.5 w-px bg-border" />
+          <div className="flex items-center gap-1.5 text-primary">
+            <Loader2 size={11} className="animate-spin" />
+            <span>{t("updater.downloading")}</span>
+          </div>
+        </>
+      )}
+      {updateStatus === "ready" && (
+        <>
+          <div className="h-2.5 w-px bg-border" />
+          <div className="flex items-center gap-1.5 text-success">
+            <CheckCircle2 size={11} />
+            <span>{t("updater.ready")}</span>
+          </div>
+        </>
+      )}
+
       <div className="ml-auto">
-        <span className="opacity-50">NodeShift v0.1.0</span>
+        <span className="opacity-50">NodeShift {t("app.version")}</span>
       </div>
     </div>
   );

@@ -1,5 +1,6 @@
 import { LayoutDashboard, Layers, Settings } from "lucide-react";
 import { cn } from "@/lib/cn";
+import { useTranslation } from "@/i18n";
 
 type Page = "dashboard" | "versions" | "settings";
 
@@ -8,13 +9,15 @@ interface SidebarProps {
   onNavigate: (page: Page) => void;
 }
 
-const navItems: { id: Page; label: string; icon: typeof LayoutDashboard }[] = [
-  { id: "dashboard", label: "仪表盘", icon: LayoutDashboard },
-  { id: "versions", label: "版本管理", icon: Layers },
-  { id: "settings", label: "设置", icon: Settings },
+const navItems: { id: Page; labelKey: string; icon: typeof LayoutDashboard }[] = [
+  { id: "dashboard", labelKey: "nav.dashboard", icon: LayoutDashboard },
+  { id: "versions", labelKey: "nav.versions", icon: Layers },
+  { id: "settings", labelKey: "nav.settings", icon: Settings },
 ];
 
 export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
+  const { t } = useTranslation();
+
   return (
     <div className="flex h-full w-52 flex-col bg-sidebar border-r border-border">
       {/* Logo */}
@@ -24,14 +27,14 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
         </div>
         <div>
           <span className="text-sm font-semibold tracking-tight">NodeShift</span>
-          <p className="text-[10px] text-muted-foreground leading-none mt-0.5">Version Manager</p>
+          <p className="text-[10px] text-muted-foreground leading-none mt-0.5">{t("sidebar.subtitle")}</p>
         </div>
       </div>
 
       {/* Navigation */}
       <nav className="flex-1 px-3 pt-2">
         <p className="mb-2 px-3 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">
-          导航
+          {t("nav.label")}
         </p>
         <ul className="space-y-0.5">
           {navItems.map((item) => {
@@ -49,7 +52,7 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
                   )}
                 >
                   <Icon size={16} strokeWidth={isActive ? 2.5 : 2} />
-                  {item.label}
+                  {t(item.labelKey)}
                 </button>
               </li>
             );
@@ -61,7 +64,7 @@ export default function Sidebar({ currentPage, onNavigate }: SidebarProps) {
       <div className="border-t border-border px-4 py-3">
         <div className="flex items-center gap-2">
           <div className="h-1.5 w-1.5 rounded-full bg-success animate-pulse" />
-          <span className="text-[10px] text-muted-foreground">v0.1.0</span>
+          <span className="text-[10px] text-muted-foreground">{t("app.version")}</span>
         </div>
       </div>
     </div>

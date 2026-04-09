@@ -1,4 +1,5 @@
 import { CheckCircle, XCircle, Loader2, X } from "lucide-react";
+import { useTranslation } from "@/i18n";
 import type { InstallStatus } from "@/lib/types";
 
 interface ProgressBarProps {
@@ -7,6 +8,7 @@ interface ProgressBarProps {
 }
 
 export default function ProgressBar({ status, onDismiss }: ProgressBarProps) {
+  const { t } = useTranslation();
   const canDismiss = status.type === "completed" || status.type === "error";
 
   return (
@@ -33,12 +35,12 @@ export default function ProgressBar({ status, onDismiss }: ProgressBarProps) {
               <Loader2 size={15} className="animate-spin text-primary" />
             )}
           <span className="text-xs font-semibold">
-            {status.type === "downloading" && "正在下载..."}
-            {status.type === "verifying" && "正在校验 SHA256..."}
-            {status.type === "extracting" && "正在解压..."}
-            {status.type === "configuring" && "正在配置环境变量..."}
-            {status.type === "completed" && "安装完成"}
-            {status.type === "error" && `安装失败: ${status.message}`}
+            {status.type === "downloading" && t("install.downloading")}
+            {status.type === "verifying" && t("install.verifying")}
+            {status.type === "extracting" && t("install.extracting")}
+            {status.type === "configuring" && t("install.configuring")}
+            {status.type === "completed" && t("install.completed")}
+            {status.type === "error" && `${t("install.failed")}: ${status.message}`}
           </span>
         </div>
         {canDismiss && (

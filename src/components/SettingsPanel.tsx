@@ -8,23 +8,35 @@ import {
   RotateCcw,
   Trash2,
   RefreshCw,
+  Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import { useConfig } from "@/hooks/useConfig";
+import { useTranslation } from "@/i18n";
+import { pickFolder, getCacheInfo, clearCache, type CacheInfo } from "@/lib/tauri";
 
-const MIRRORS = [
-  { name: "官方源", url: "https://nodejs.org/dist/" },
-  { name: "淘宝源 (npmmirror)", url: "https://npmmirror.com/mirrors/node/" },
-  { name: "华为源", url: "https://repo.huaweicloud.com/nodejs/" },
-  { name: "腾讯源", url: "https://mirrors.cloud.tencent.com/nodejs-release/" },
+const MIRROR_KEYS = [
+  { key: "mirrors.official", url: "https://nodejs.org/dist/" },
+  { key: "mirrors.taobao", url: "https://npmmirror.com/mirrors/node/" },
+  { key: "mirrors.huawei", url: "https://repo.huaweicloud.com/nodejs/" },
+  { key: "mirrors.tencent", url: "https://mirrors.cloud.tencent.com/nodejs-release/" },
 ];
 
-const NPM_REGISTRIES = [
-  { name: "npm 官方", url: "https://registry.npmjs.org" },
-  { name: "淘宝源", url: "https://registry.npmmirror.com" },
-  { name: "腾讯源", url: "https://mirrors.cloud.tencent.com/npm/" },
+const NPM_REGISTRY_KEYS = [
+  { key: "npmRegistries.official", url: "https://registry.npmjs.org" },
+  { key: "npmRegistries.taobao", url: "https://registry.npmmirror.com" },
+  { key: "npmRegistries.tencent", url: "https://mirrors.cloud.tencent.com/npm/" },
 ];
+
+function formatSize(bytes: number): string {
+  if (bytes === 0) return "0 B";
+  const units = ["B", "KB", "MB", "GB"];
+  const i = Math.floor(Math.log(bytes) / Math.log(1024));
+  return `${(bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1)} ${units[i]}`;
+}
 
 export default function SettingsPanel() {
+  const { t } = useTranslation();
   const { config, loading, update } = useConfig();
 
   const [installDir, setInstallDir] = useState("");
@@ -36,6 +48,11 @@ export default function SettingsPanel() {
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
+  // Cache state
+  const [cacheInfo, setCacheInfo] = useState<CacheInfo | null>(null);
+  const [clearing, setClearing] = useState(false);
+  const [cleared, setCleared] = useState(false);
+
   useEffect(() => {
     if (config) {
       setInstallDir(config.installDir);
@@ -46,6 +63,11 @@ export default function SettingsPanel() {
       setDirty(false);
     }
   }, [config]);
+
+  // Load cache info on mount
+  useEffect(() => {
+    getCacheInfo().then(setCacheInfo).catch(() => {});
+  }, []);
 
   const markDirty = () => {
     setDirty(true);
@@ -78,19 +100,35 @@ export default function SettingsPanel() {
     }
   };
 
+  const handleClearCache = async () => {
+    setClearing(true);
+    setCleared(false);
+    try {
+      const info = await clearCache();
+      setCacheInfo(info);
+      setCleared(true);
+      setTimeout(() => setCleared(false), 2000);
+    } catch {
+      // ignore
+    }
+    setClearing(false);
+  };
+
   if (loading || !config) {
     return (
       <div className="flex items-center justify-center py-20 text-xs text-muted-foreground">
         <RefreshCw size={14} className="mr-2 animate-spin" />
-        加载设置中...
+        {t("settings.loadingSettings")}
       </div>
     );
   }
 
+  const cacheIsEmpty = cacheInfo ? cacheInfo.fileCount === 0 : true;
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">设置</h1>
+        <h1 className="text-xl font-bold">{t("settings.title")}</h1>
         <div className="flex gap-2">
           {dirty && (
             <button
@@ -98,7 +136,7 @@ export default function SettingsPanel() {
               className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
               <RotateCcw size={13} />
-              重置
+              {t("settings.reset")}
             </button>
           )}
           <button
@@ -111,7 +149,7 @@ export default function SettingsPanel() {
             }`}
           >
             <Save size={13} />
-            {saving ? "保存中..." : saved ? "已保存" : "保存设置"}
+            {saving ? t("settings.saving") : saved ? t("settings.saved") : t("settings.save")}
           </button>
         </div>
       </div>
@@ -119,8 +157,8 @@ export default function SettingsPanel() {
       {/* Install Path */}
       <SettingSection
         icon={<FolderOpen size={16} />}
-        title="安装路径"
-        description="Node.js 版本的存储位置"
+        title={t("settings.installPath")}
+        description={t("settings.installPathDesc")}
       >
         <div className="flex gap-2">
           <input
@@ -132,20 +170,29 @@ export default function SettingsPanel() {
             }}
             className="flex-1 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground font-mono focus:outline-none focus:ring-1 focus:ring-primary/50"
           />
-          <button className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary/80">
-            浏览
+          <button
+            onClick={async () => {
+              const folder = await pickFolder(installDir);
+              if (folder) {
+                setInstallDir(folder);
+                markDirty();
+              }
+            }}
+            className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary/80"
+          >
+            {t("settings.browse")}
           </button>
         </div>
         <p className="mt-1 text-[10px] text-muted-foreground font-mono">
-          {installDir}/versions/
+          {t("settings.storagePath")} {installDir}/versions/
         </p>
       </SettingSection>
 
       {/* Mirror Source */}
       <SettingSection
         icon={<Globe size={16} />}
-        title="镜像源"
-        description="下载 Node.js 时使用的镜像源，国内用户建议选择淘宝源"
+        title={t("settings.mirror")}
+        description={t("settings.mirrorDesc")}
       >
         <select
           value={mirror}
@@ -155,9 +202,9 @@ export default function SettingsPanel() {
           }}
           className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
         >
-          {MIRRORS.map((m) => (
+          {MIRROR_KEYS.map((m) => (
             <option key={m.url} value={m.url}>
-              {m.name} - {m.url}
+              {t(m.key)} - {m.url}
             </option>
           ))}
         </select>
@@ -166,8 +213,8 @@ export default function SettingsPanel() {
       {/* Proxy */}
       <SettingSection
         icon={<Shield size={16} />}
-        title="代理设置"
-        description="如果需要通过代理下载，请配置代理地址"
+        title={t("settings.proxy")}
+        description={t("settings.proxyDesc")}
       >
         <input
           type="text"
@@ -176,7 +223,7 @@ export default function SettingsPanel() {
             setProxy(e.target.value);
             markDirty();
           }}
-          placeholder="例如: http://127.0.0.1:7890"
+          placeholder={t("settings.proxyPlaceholder")}
           className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground/50 focus:outline-none focus:ring-1 focus:ring-primary/50"
         />
       </SettingSection>
@@ -184,8 +231,8 @@ export default function SettingsPanel() {
       {/* npm Registry */}
       <SettingSection
         icon={<Package size={16} />}
-        title="npm 源"
-        description="npm install 时使用的 registry"
+        title={t("settings.npmRegistry")}
+        description={t("settings.npmRegistryDesc")}
       >
         <select
           value={npmRegistry}
@@ -195,9 +242,9 @@ export default function SettingsPanel() {
           }}
           className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
         >
-          {NPM_REGISTRIES.map((r) => (
+          {NPM_REGISTRY_KEYS.map((r) => (
             <option key={r.url} value={r.url}>
-              {r.name} - {r.url}
+              {t(r.key)} - {r.url}
             </option>
           ))}
         </select>
@@ -206,8 +253,8 @@ export default function SettingsPanel() {
       {/* Auto Switch */}
       <SettingSection
         icon={<RefreshCw size={16} />}
-        title="自动切换"
-        description="进入包含 .nvmrc 或 .node-version 文件的项目时自动切换版本"
+        title={t("settings.autoSwitch")}
+        description={t("settings.autoSwitchDesc")}
       >
         <label className="flex cursor-pointer items-center gap-3">
           <div className="relative">
@@ -223,23 +270,55 @@ export default function SettingsPanel() {
             <div className="h-5 w-9 rounded-full bg-secondary transition-colors peer-checked:bg-primary" />
             <div className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-foreground transition-transform peer-checked:translate-x-4" />
           </div>
-          <span className="text-xs">{autoSwitch ? "已启用" : "已关闭"}</span>
+          <span className="text-xs">{autoSwitch ? t("settings.enabled") : t("settings.disabled")}</span>
         </label>
       </SettingSection>
 
       {/* Cache Management */}
       <SettingSection
         icon={<Trash2 size={16} />}
-        title="缓存管理"
-        description="清理已下载的 Node.js 压缩包缓存"
+        title={t("settings.cache")}
+        description={t("settings.cacheDesc")}
       >
         <div className="flex items-center justify-between">
-          <span className="text-[10px] text-muted-foreground font-mono">
-            {installDir}/cache/
-          </span>
-          <button className="flex items-center gap-1.5 rounded-lg border border-destructive/30 px-3 py-1.5 text-[11px] font-medium text-destructive transition-colors hover:bg-destructive/10">
-            <Trash2 size={12} />
-            清理缓存
+          <div>
+            <p className="text-[10px] text-muted-foreground font-mono">
+              {cacheInfo?.cacheDir ?? `${installDir}/cache/`}
+            </p>
+            {cacheInfo && !cacheIsEmpty && (
+              <p className="mt-1 text-[11px] text-foreground">
+                {t("settings.cacheSize", { size: formatSize(cacheInfo.totalSize) })}
+                {" / "}
+                {t("settings.cacheFiles", { count: String(cacheInfo.fileCount) })}
+              </p>
+            )}
+            {cacheIsEmpty && (
+              <p className="mt-1 text-[11px] text-muted-foreground">
+                {t("settings.cacheEmpty")}
+              </p>
+            )}
+          </div>
+          <button
+            onClick={handleClearCache}
+            disabled={cacheIsEmpty || clearing}
+            className="flex items-center gap-1.5 rounded-lg border border-destructive/30 px-3 py-1.5 text-[11px] font-medium text-destructive transition-colors hover:bg-destructive/10 disabled:opacity-40"
+          >
+            {clearing ? (
+              <>
+                <Loader2 size={12} className="animate-spin" />
+                {t("settings.clearing")}
+              </>
+            ) : cleared ? (
+              <>
+                <CheckCircle2 size={12} />
+                {t("settings.cleared")}
+              </>
+            ) : (
+              <>
+                <Trash2 size={12} />
+                {t("settings.clearCache")}
+              </>
+            )}
           </button>
         </div>
       </SettingSection>

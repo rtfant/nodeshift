@@ -12,11 +12,13 @@ import {
 import { useVersions, type VersionFilter } from "@/hooks/useVersions";
 import { useConfig } from "@/hooks/useConfig";
 import { useInstall } from "@/hooks/useInstall";
+import { useTranslation } from "@/i18n";
 import type { NodeVersion } from "@/lib/types";
 import InstallDialog from "./InstallDialog";
 import ProgressBar from "./ProgressBar";
 
 export default function VersionList() {
+  const { t } = useTranslation();
   const { versions, loading, error, filter, setFilter, search, setSearch, reload } =
     useVersions();
   const { config, reload: reloadConfig } = useConfig();
@@ -41,11 +43,11 @@ export default function VersionList() {
   const getVersionStatus = (v: NodeVersion): string => {
     if (v.lts) {
       const major = parseInt(v.version.slice(1));
-      if (major >= 22) return "Active LTS";
-      if (major >= 18) return "Maintenance";
-      return "EOL";
+      if (major >= 22) return t("versions.activeLts");
+      if (major >= 18) return t("versions.maintenance");
+      return t("versions.eol");
     }
-    return "Current";
+    return t("versions.current");
   };
 
   const isInstalled = (version: string) => version in installedVersions;
@@ -54,14 +56,14 @@ export default function VersionList() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">版本管理</h1>
+        <h1 className="text-xl font-bold">{t("versions.title")}</h1>
         <button
           onClick={reload}
           disabled={loading}
           className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground disabled:opacity-50"
         >
           <RefreshCw size={13} className={loading ? "animate-spin" : ""} />
-          刷新
+          {t("versions.refresh")}
         </button>
       </div>
 
@@ -83,7 +85,7 @@ export default function VersionList() {
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
-              {f === "lts" ? "LTS" : f === "current" ? "Current" : "全部"}
+              {f === "lts" ? t("versions.lts") : f === "current" ? t("versions.current") : t("versions.all")}
             </button>
           ))}
         </div>
@@ -95,7 +97,7 @@ export default function VersionList() {
           />
           <input
             type="text"
-            placeholder="搜索版本..."
+            placeholder={t("versions.search")}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-52 rounded-lg border border-border bg-card py-1.5 pl-8 pr-3 text-xs text-foreground placeholder:text-muted-foreground/60 focus:outline-none focus:ring-1 focus:ring-primary/50"
@@ -109,7 +111,7 @@ export default function VersionList() {
           <AlertCircle size={14} />
           <span>{error}</span>
           <button onClick={reload} className="ml-auto font-medium underline">
-            重试
+            {t("versions.retry")}
           </button>
         </div>
       )}
@@ -118,7 +120,7 @@ export default function VersionList() {
       {loading && (
         <div className="flex items-center justify-center py-20">
           <Loader2 size={20} className="animate-spin text-primary" />
-          <span className="ml-2 text-xs text-muted-foreground">正在获取版本列表...</span>
+          <span className="ml-2 text-xs text-muted-foreground">{t("versions.loading")}</span>
         </div>
       )}
 
@@ -127,11 +129,11 @@ export default function VersionList() {
         <div className="rounded-xl border border-border bg-card overflow-hidden">
           {/* Table Header */}
           <div className="grid grid-cols-[1fr_110px_90px_90px_150px] gap-4 border-b border-border bg-secondary/30 px-4 py-2.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-            <span>版本</span>
-            <span>状态</span>
-            <span>LTS</span>
-            <span>日期</span>
-            <span className="text-right">操作</span>
+            <span>{t("versions.version")}</span>
+            <span>{t("versions.status")}</span>
+            <span>{t("versions.ltsName")}</span>
+            <span>{t("versions.releaseDate")}</span>
+            <span className="text-right">{t("versions.actions")}</span>
           </div>
 
           {/* Table Body */}
@@ -155,12 +157,12 @@ export default function VersionList() {
                     <span className="font-mono text-[13px] font-semibold">{v.version}</span>
                     {active && (
                       <span className="rounded-full bg-primary/15 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                        使用中
+                        {t("versions.using")}
                       </span>
                     )}
                     {installed && !active && (
                       <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                        已安装
+                        {t("versions.installed")}
                       </span>
                     )}
                   </div>
@@ -191,13 +193,13 @@ export default function VersionList() {
                         className="flex items-center gap-1.5 rounded-lg bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_10px_rgba(34,197,94,0.2)] disabled:opacity-50"
                       >
                         <Download size={12} />
-                        安装
+                        {t("versions.install")}
                       </button>
                     )}
                     {installed && active && (
                       <span className="flex items-center gap-1.5 rounded-lg bg-primary/10 px-3 py-1 text-[11px] font-semibold text-primary">
                         <Check size={12} />
-                        使用中
+                        {t("versions.using")}
                       </span>
                     )}
                     {installed && !active && (
@@ -211,11 +213,11 @@ export default function VersionList() {
                           className="flex items-center gap-1 rounded-lg bg-secondary px-2.5 py-1 text-[11px] font-medium text-foreground transition-colors hover:bg-secondary/80"
                         >
                           <ArrowUpDown size={11} />
-                          使用
+                          {t("versions.use")}
                         </button>
                         <button
                           onClick={async () => {
-                            if (!confirm(`确认卸载 ${v.version}？`)) return;
+                            if (!confirm(t("versions.confirmUninstall", { version: v.version }))) return;
                             const { uninstallVersion } = await import("@/lib/tauri");
                             await uninstallVersion(v.version);
                             await reloadConfig();
@@ -234,7 +236,7 @@ export default function VersionList() {
 
           {versions.length === 0 && !loading && (
             <div className="py-16 text-center text-xs text-muted-foreground">
-              没有找到匹配的版本
+              {t("versions.noResults")}
             </div>
           )}
         </div>

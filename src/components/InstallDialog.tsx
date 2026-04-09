@@ -1,12 +1,14 @@
 import { useState } from "react";
 import { X, Download, FolderOpen, Globe } from "lucide-react";
+import { useTranslation } from "@/i18n";
+import { pickFolder } from "@/lib/tauri";
 import type { NodeVersion } from "@/lib/types";
 
-const MIRRORS = [
-  { name: "官方源", url: "https://nodejs.org/dist/" },
-  { name: "淘宝源 (npmmirror)", url: "https://npmmirror.com/mirrors/node/" },
-  { name: "华为源", url: "https://repo.huaweicloud.com/nodejs/" },
-  { name: "腾讯源", url: "https://mirrors.cloud.tencent.com/nodejs-release/" },
+const MIRROR_KEYS = [
+  { key: "mirrors.official", url: "https://nodejs.org/dist/" },
+  { key: "mirrors.taobao", url: "https://npmmirror.com/mirrors/node/" },
+  { key: "mirrors.huawei", url: "https://repo.huaweicloud.com/nodejs/" },
+  { key: "mirrors.tencent", url: "https://mirrors.cloud.tencent.com/nodejs-release/" },
 ];
 
 interface InstallDialogProps {
@@ -24,6 +26,7 @@ export default function InstallDialog({
   onConfirm,
   onCancel,
 }: InstallDialogProps) {
+  const { t } = useTranslation();
   const [installDir, setInstallDir] = useState(defaultInstallDir);
   const [mirror, setMirror] = useState(defaultMirror);
 
@@ -33,7 +36,7 @@ export default function InstallDialog({
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border px-5 py-4">
           <div>
-            <h2 className="text-base font-semibold">安装 Node.js</h2>
+            <h2 className="text-base font-semibold">{t("install.title")}</h2>
             <p className="mt-0.5 text-xs text-muted-foreground">
               {version.version}
               {version.lts ? ` (${version.lts} LTS)` : " (Current)"}
@@ -53,7 +56,7 @@ export default function InstallDialog({
           <div>
             <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold">
               <FolderOpen size={13} className="text-muted-foreground" />
-              安装路径
+              {t("install.installPath")}
             </label>
             <div className="flex gap-2">
               <input
@@ -62,12 +65,18 @@ export default function InstallDialog({
                 onChange={(e) => setInstallDir(e.target.value)}
                 className="flex-1 rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
               />
-              <button className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-secondary/80">
-                浏览
+              <button
+                onClick={async () => {
+                  const folder = await pickFolder(installDir);
+                  if (folder) setInstallDir(folder);
+                }}
+                className="rounded-lg border border-border bg-secondary px-3 py-1.5 text-xs text-foreground transition-colors hover:bg-secondary/80"
+              >
+                {t("install.browse")}
               </button>
             </div>
             <p className="mt-1 text-[10px] text-muted-foreground">
-              安装到: {installDir}/versions/{version.version}
+              {t("install.installTo")}: {installDir}/versions/{version.version}
             </p>
           </div>
 
@@ -75,16 +84,16 @@ export default function InstallDialog({
           <div>
             <label className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold">
               <Globe size={13} className="text-muted-foreground" />
-              镜像源
+              {t("install.mirror")}
             </label>
             <select
               value={mirror}
               onChange={(e) => setMirror(e.target.value)}
               className="w-full rounded-lg border border-border bg-muted px-3 py-1.5 text-xs text-foreground focus:outline-none focus:ring-1 focus:ring-primary/50"
             >
-              {MIRRORS.map((m) => (
+              {MIRROR_KEYS.map((m) => (
                 <option key={m.url} value={m.url}>
-                  {m.name}
+                  {t(m.key)}
                 </option>
               ))}
             </select>
@@ -93,7 +102,7 @@ export default function InstallDialog({
           {/* Version Info */}
           <div className="rounded-lg bg-muted/80 p-3">
             <h4 className="mb-2 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
-              版本详情
+              {t("install.versionDetails")}
             </h4>
             <div className="grid grid-cols-2 gap-1.5 text-[11px]">
               <div>
@@ -105,7 +114,7 @@ export default function InstallDialog({
                 <span className="font-medium">{version.v8 || "-"}</span>
               </div>
               <div>
-                <span className="text-muted-foreground">发布日期: </span>
+                <span className="text-muted-foreground">{t("install.releaseDate")}: </span>
                 <span className="font-medium">{version.date}</span>
               </div>
               <div>
@@ -122,14 +131,14 @@ export default function InstallDialog({
             onClick={onCancel}
             className="rounded-lg border border-border px-4 py-1.5 text-xs font-medium text-foreground transition-colors hover:bg-secondary"
           >
-            取消
+            {t("install.cancel")}
           </button>
           <button
             onClick={() => onConfirm(installDir, mirror)}
             className="flex items-center gap-1.5 rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-[0_0_12px_rgba(34,197,94,0.2)]"
           >
             <Download size={13} />
-            开始安装
+            {t("install.startInstall")}
           </button>
         </div>
       </div>

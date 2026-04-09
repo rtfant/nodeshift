@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { Monitor, HardDrive, Package, ArrowRight, Zap } from "lucide-react";
 import { greet, getSystemInfo, getConfig } from "@/lib/tauri";
+import { useTranslation } from "@/i18n";
 import type { AppConfig, SystemInfo } from "@/lib/types";
 
 interface DashboardProps {
@@ -8,6 +9,7 @@ interface DashboardProps {
 }
 
 export default function Dashboard({ onNavigate }: DashboardProps) {
+  const { t } = useTranslation();
   const [ipcStatus, setIpcStatus] = useState<"testing" | "ok" | "error">("testing");
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
   const [config, setConfig] = useState<AppConfig | null>(null);
@@ -28,7 +30,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold">仪表盘</h1>
+        <h1 className="text-xl font-bold">{t("dashboard.title")}</h1>
         <div className="flex items-center gap-2">
           <div
             className={`h-2 w-2 rounded-full ${
@@ -40,7 +42,11 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
             }`}
           />
           <span className="text-[11px] text-muted-foreground">
-            {ipcStatus === "ok" ? "IPC 正常" : ipcStatus === "error" ? "浏览器模式" : "连接中..."}
+            {ipcStatus === "ok"
+              ? t("dashboard.ipcOk")
+              : ipcStatus === "error"
+                ? t("dashboard.ipcError")
+                : t("dashboard.ipcConnecting")}
           </span>
         </div>
       </div>
@@ -49,26 +55,26 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
       <div className="grid grid-cols-3 gap-4">
         <StatusCard
           icon={<Package size={18} />}
-          label="当前版本"
-          value={currentVersion ?? "未安装"}
+          label={t("dashboard.currentVersion")}
+          value={currentVersion ?? t("dashboard.notInstalled")}
           sublabel={
             currentVersion
               ? currentLts
                 ? `${currentLts} LTS`
                 : "Current"
-              : "尚未安装 Node.js"
+              : t("dashboard.noNodeInstalled")
           }
           highlight={!!currentVersion}
         />
         <StatusCard
           icon={<HardDrive size={18} />}
-          label="已安装版本"
+          label={t("dashboard.installedVersions")}
           value={String(installedCount)}
-          sublabel="个版本"
+          sublabel={t("dashboard.versionsCount")}
         />
         <StatusCard
           icon={<Monitor size={18} />}
-          label="系统平台"
+          label={t("dashboard.systemPlatform")}
           value={
             systemInfo
               ? systemInfo.platform === "macos"
@@ -78,7 +84,7 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
                   : "Linux"
               : "--"
           }
-          sublabel={systemInfo ? systemInfo.arch : "检测中..."}
+          sublabel={systemInfo ? systemInfo.arch : t("dashboard.detecting")}
         />
       </div>
 
@@ -87,34 +93,34 @@ export default function Dashboard({ onNavigate }: DashboardProps) {
         <div className="rounded-xl border border-primary/15 bg-primary/[0.03] p-5 glow-primary">
           <div className="mb-3 flex items-center gap-2">
             <Zap size={14} className="text-primary" />
-            <h2 className="text-sm font-semibold text-primary">当前活跃版本</h2>
+            <h2 className="text-sm font-semibold text-primary">{t("dashboard.activeVersion")}</h2>
           </div>
           <div className="grid grid-cols-2 gap-3 text-sm">
             <InfoRow label="Node.js" value={currentVersion} mono />
             <InfoRow
-              label="路径"
+              label={t("dashboard.path")}
               value={config.versions[currentVersion]?.path ?? "-"}
               mono
               small
             />
-            {currentLts && <InfoRow label="LTS 代号" value={currentLts} />}
-            <InfoRow label="镜像源" value={config.mirror} small />
+            {currentLts && <InfoRow label={t("dashboard.ltsCodename")} value={currentLts} />}
+            <InfoRow label={t("dashboard.mirrorSource")} value={config.mirror} small />
           </div>
         </div>
       )}
 
       {/* Quick Start */}
       <div className="rounded-xl border border-border bg-card p-5">
-        <h2 className="mb-2 text-sm font-semibold">快速开始</h2>
+        <h2 className="mb-2 text-sm font-semibold">{t("dashboard.quickStart")}</h2>
         <p className="text-[13px] text-secondary-foreground leading-relaxed">
-          前往{" "}
+          {t("dashboard.quickStartDesc").split(t("dashboard.goToVersions"))[0]}
           <button
             onClick={() => onNavigate?.("versions")}
             className="inline-flex items-center gap-1 font-medium text-primary hover:underline"
           >
-            版本管理 <ArrowRight size={12} />
-          </button>{" "}
-          页面选择并安装你需要的 Node.js 版本。安装完成后，NodeShift 会自动配置系统环境变量。
+            {t("dashboard.goToVersions")} <ArrowRight size={12} />
+          </button>
+          {t("dashboard.quickStartDesc").split(t("dashboard.goToVersions"))[1] || ""}
         </p>
       </div>
     </div>

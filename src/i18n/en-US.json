@@ -1,12 +1,16 @@
 {
   "app": {
     "name": "NodeShift",
-    "version": "v0.1.0"
+    "version": "v0.1.1"
   },
   "nav": {
+    "label": "Navigation",
     "dashboard": "Dashboard",
     "versions": "Versions",
     "settings": "Settings"
+  },
+  "sidebar": {
+    "subtitle": "Version Manager"
   },
   "dashboard": {
     "title": "Dashboard",
@@ -20,8 +24,12 @@
     "activeVersion": "Active Version",
     "ipcTest": "Tauri IPC Test",
     "ipcTesting": "Testing IPC communication...",
-    "ipcOk": "IPC communication OK",
-    "ipcError": "IPC communication failed (normal when running in browser, test in Tauri)",
+    "ipcOk": "IPC OK",
+    "ipcError": "Browser Mode",
+    "ipcConnecting": "Connecting...",
+    "path": "Path",
+    "ltsCodename": "LTS Codename",
+    "mirrorSource": "Mirror Source",
     "quickStart": "Quick Start",
     "quickStartDesc": "Go to the Versions page to select and install the Node.js version you need. NodeShift will automatically configure your system PATH after installation.",
     "goToVersions": "Versions"
@@ -57,6 +65,7 @@
     "installTo": "Will be installed to",
     "mirror": "Mirror",
     "versionDetails": "Version Details",
+    "releaseDate": "Release Date",
     "cancel": "Cancel",
     "startInstall": "Install",
     "browse": "Browse",
@@ -73,6 +82,7 @@
     "saving": "Saving...",
     "saved": "Saved",
     "reset": "Reset",
+    "loadingSettings": "Loading settings...",
     "installPath": "Install Path",
     "installPathDesc": "Storage location for Node.js versions",
     "mirror": "Mirror Source",
@@ -89,8 +99,36 @@
     "cache": "Cache Management",
     "cacheDesc": "Clean up downloaded Node.js archive cache",
     "cacheDir": "Cache directory",
+    "cacheSize": "{size} used",
+    "cacheFiles": "{count} files",
+    "cacheEmpty": "Cache is empty",
     "clearCache": "Clear Cache",
+    "clearing": "Clearing...",
+    "cleared": "Cleared",
     "browse": "Browse",
     "storagePath": "Versions stored at"
+  },
+  "mirrors": {
+    "official": "Official",
+    "taobao": "Taobao (npmmirror)",
+    "huawei": "Huawei",
+    "tencent": "Tencent"
+  },
+  "npmRegistries": {
+    "official": "npm Official",
+    "taobao": "Taobao",
+    "tencent": "Tencent"
+  },
+  "statusBar": {
+    "notInstalled": "Not Installed",
+    "versionsCount": "{count} versions"
+  },
+  "updater": {
+    "checking": "Checking for updates...",
+    "available": "Update {version} available",
+    "downloading": "Downloading update...",
+    "ready": "Update ready. Restart to apply.",
+    "upToDate": "Up to date",
+    "error": "Update check failed"
   }
 }

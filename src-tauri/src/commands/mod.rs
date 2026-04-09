@@ -1,3 +1,4 @@
+pub mod cache;
 pub mod config;
 pub mod system;
 pub mod version;
