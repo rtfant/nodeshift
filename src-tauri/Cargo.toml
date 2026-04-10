@@ -41,7 +41,9 @@ strip = true
 lto = true
 codegen-units = 1
 opt-level = "s"
-panic = "abort"
+# Temporarily changed from "abort" to "unwind" so panic messages are visible.
+# Restore to "abort" after diagnosing.
+panic = "unwind"
 
 [features]
 custom-protocol = ["tauri/custom-protocol"]
