@@ -32,7 +32,7 @@ impl Default for AppConfig {
             .unwrap_or_else(|| "~/.nodeshift".to_string());
 
         Self {
-            version: "1.0.0".to_string(),
+            version: "0.1.4".to_string(),
             install_dir,
             mirror: "https://npmmirror.com/mirrors/node/".to_string(),
             current_version: None,

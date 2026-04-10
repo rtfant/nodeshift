@@ -79,14 +79,19 @@ jobs:
       # macOS: fall back to ad-hoc signing when no certificate is configured
       - name: Set macOS signing identity
         if: runner.os == 'macOS'
+        env:
+          IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLEID: ${{ secrets.APPLE_ID }}
+          APPLEPWD: ${{ secrets.APPLE_PASSWORD }}
+          TEAMID: ${{ secrets.APPLE_TEAM_ID }}
         run: |
-          if [ -n "${{ secrets.APPLE_SIGNING_IDENTITY }}" ]; then
-            echo "APPLE_SIGNING_IDENTITY=${{ secrets.APPLE_SIGNING_IDENTITY }}" >> $GITHUB_ENV
-            echo "APPLE_ID=${{ secrets.APPLE_ID }}" >> $GITHUB_ENV
-            echo "APPLE_PASSWORD=${{ secrets.APPLE_PASSWORD }}" >> $GITHUB_ENV
-            echo "APPLE_TEAM_ID=${{ secrets.APPLE_TEAM_ID }}" >> $GITHUB_ENV
+          if [ -n "$IDENTITY" ]; then
+            echo "APPLE_SIGNING_IDENTITY=$IDENTITY" >> "$GITHUB_ENV"
+            echo "APPLE_ID=$APPLEID" >> "$GITHUB_ENV"
+            echo "APPLE_PASSWORD=$APPLEPWD" >> "$GITHUB_ENV"
+            echo "APPLE_TEAM_ID=$TEAMID" >> "$GITHUB_ENV"
           else
-            echo "APPLE_SIGNING_IDENTITY=-" >> $GITHUB_ENV
+            echo "APPLE_SIGNING_IDENTITY=-" >> "$GITHUB_ENV"
           fi
 
       # Build Tauri app (produces both binary and installers)
@@ -94,7 +99,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # macOS code signing & notarization (only set when certificate is configured)
+          # macOS code signing & notarization (set by previous step, empty on non-macOS)
           APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
           APPLE_ID: ${{ env.APPLE_ID }}
           APPLE_PASSWORD: ${{ env.APPLE_PASSWORD }}

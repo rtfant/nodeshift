@@ -14,7 +14,7 @@ async function tauriInvoke<T>(cmd: string, args?: Record<string, unknown>): Prom
 // ---------- Mock storage for browser mode ----------
 
 let mockConfig: AppConfig = {
-  version: "1.0.0",
+  version: "0.1.4",
   installDir: "~/.nodeshift",
   mirror: "https://npmmirror.com/mirrors/node/",
   currentVersion: null,
