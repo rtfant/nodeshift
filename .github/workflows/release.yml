@@ -19,16 +19,16 @@ jobs:
             portable_name: NodeShift-linux-x64
             binary_name: nodeshift
             binary_ext: ""
-          - platform: macos-latest
-            target: aarch64-apple-darwin
-            portable_name: NodeShift-macos-arm64
-            binary_name: nodeshift
-            binary_ext: ""
-          - platform: macos-latest
-            target: x86_64-apple-darwin
-            portable_name: NodeShift-macos-x64
-            binary_name: nodeshift
-            binary_ext: ""
+          # - platform: macos-latest
+          #   target: aarch64-apple-darwin
+          #   portable_name: NodeShift-macos-arm64
+          #   binary_name: nodeshift
+          #   binary_ext: ""
+          # - platform: macos-latest
+          #   target: x86_64-apple-darwin
+          #   portable_name: NodeShift-macos-x64
+          #   binary_name: nodeshift
+          #   binary_ext: ""
           - platform: windows-latest
             target: x86_64-pc-windows-msvc
             portable_name: NodeShift-windows-x64
@@ -76,7 +76,9 @@ jobs:
 
       - run: npm ci
 
-      # macOS: fall back to ad-hoc signing when no certificate is configured
+      # macOS: set signing config via GITHUB_ENV
+      # - With certificate: uses real identity + notarization
+      # - Without certificate: uses ad-hoc signing (-), no notarization
       - name: Set macOS signing identity
         if: runner.os == 'macOS'
         env:
@@ -95,6 +97,9 @@ jobs:
           fi
 
       # Build Tauri app (produces both binary and installers)
+      # Note: APPLE_SIGNING_IDENTITY, APPLE_ID, APPLE_PASSWORD, APPLE_TEAM_ID
+      # are inherited from GITHUB_ENV (set by previous step on macOS only).
+      # Do NOT redeclare them here — empty strings would trigger notarization.
       - name: Build and release (installer)
         uses: tauri-apps/tauri-action@v0
         env:
