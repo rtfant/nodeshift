@@ -55,10 +55,6 @@
     },
     "dialog": {
       "open": true
-    },
-    "updater": {
-      "endpoints": ["https://github.com/nicehash/nodeshift/releases/latest/download/latest.json"],
-      "pubkey": ""
     }
   }
 }
