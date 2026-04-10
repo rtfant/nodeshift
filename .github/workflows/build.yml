@@ -62,7 +62,7 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # Use ad-hoc signing for CI builds (no Apple certificate needed)
+          # macOS: use ad-hoc signing (no certificate needed for CI builds)
           APPLE_SIGNING_IDENTITY: ${{ runner.os == 'macOS' && '-' || '' }}
         with:
           args: --target ${{ matrix.target }}

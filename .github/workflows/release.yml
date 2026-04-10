@@ -76,13 +76,23 @@ jobs:
 
       - run: npm ci
 
+      # macOS: fall back to ad-hoc signing when no certificate is configured
+      - name: Set macOS signing identity
+        if: runner.os == 'macOS'
+        run: |
+          if [ -n "${{ secrets.APPLE_SIGNING_IDENTITY }}" ]; then
+            echo "APPLE_SIGNING_IDENTITY=${{ secrets.APPLE_SIGNING_IDENTITY }}" >> $GITHUB_ENV
+          else
+            echo "APPLE_SIGNING_IDENTITY=-" >> $GITHUB_ENV
+          fi
+
       # Build Tauri app (produces both binary and installers)
       - name: Build and release (installer)
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # macOS code signing & notarization
-          APPLE_SIGNING_IDENTITY: ${{ secrets.APPLE_SIGNING_IDENTITY }}
+          APPLE_SIGNING_IDENTITY: ${{ env.APPLE_SIGNING_IDENTITY }}
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APPLE_PASSWORD: ${{ secrets.APPLE_PASSWORD }}
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
